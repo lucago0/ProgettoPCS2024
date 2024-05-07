@@ -30,7 +30,6 @@ bool importFracture(const string& filename, Fractures& fracture) {
         getline(file, line);
         stringstream ss(line);
         ss >> fracture.Id >> pv >> numVertices;
-        cout << fracture.Id << " " << numVertices << endl;
 
         Matrix<double, 3, Dynamic> actualVert(3, numVertices);
 
@@ -41,10 +40,7 @@ bool importFracture(const string& filename, Fractures& fracture) {
             for(int i = 0; i < numVertices; i++){
                 file >> val;
                 actualVert(j, i) = stod(val);
-                cout << actualVert(j, i) << endl;
-
             }
-            cout << endl;
         }
         file >> pv; //per gestire la fine con lo spazio vuoto
 
