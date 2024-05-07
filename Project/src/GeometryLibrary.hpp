@@ -1,17 +1,20 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <array>
 #include <Eigen/Eigen>
 
+using namespace std;
+using namespace Eigen;
 
 namespace FracturesLib{
 
 struct Fractures{
     unsigned int NumberFractures = 0;
     unsigned int Id;
-    map<unsigned int, vector<array<double, 3>>> Vertices;
-    double tol = numeric_limits<double>::epsilon(); // precisione
-    double tol_aree = tol*tol/2;
+    map<unsigned int, Matrix<double, 3, Dynamic>> Vertices;
+    //double tol = numeric_limits<double>::epsilon(); // precisione
+    //double tol_aree = tol*tol/2;
 };
 
 struct Traces{
@@ -20,4 +23,7 @@ struct Traces{
     map<unsigned int, array<double, 3>> Vertices;
     bool Tips;
 };
+
+bool importFracture(const string& filename, Fractures& fracture);
+
 };

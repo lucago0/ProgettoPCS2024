@@ -47,10 +47,10 @@ list(APPEND testing_INCLUDE ${src_includes})
 # Create executable
 ################################################################################
 add_executable(${PROJECT_NAME}
-	main.cpp
-	${testing_SOURCES}
+        main.cpp
+        ${testing_SOURCES}
     ${testing_HEADERS})
-    
+
 target_link_libraries(${PROJECT_NAME} ${testing_LINKED_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${testing_INCLUDE})
 target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
