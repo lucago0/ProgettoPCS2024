@@ -1,11 +1,16 @@
 #include <iostream>
+#include "GeometryLibrary.hpp"
 
+using namespace std;
+using namespace FracturesLib;
 
 int main()
 {
-    std::cout << "ok cambiato branch" << std::endl;
-    std::cout << "Prova andre" << std::endl;
-
-    //prova branch update
-  return 0;
+    Fracture fracture;
+    string filepath = "DFN";
+    if(!importFracture(filepath, fracture))
+    {
+        return 1;
+    }
+    return 0;
 }
