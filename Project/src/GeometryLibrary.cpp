@@ -22,10 +22,11 @@ bool importFracture(const string& filename, Fractures& fracture) {
     string line;
     getline(file,line);
     fracture.NumberFractures = stoi(line);
+    int numFrac = stoi(line);
     char pv;
     int numVertices;
 
-    while (fracture.NumberFractures--) {
+    while (numFrac--) {
         getline(file, line);
         getline(file, line);
         stringstream ss(line);
@@ -47,7 +48,8 @@ bool importFracture(const string& filename, Fractures& fracture) {
         // Add fracture data to the fractures map
         fracture.Vertices.insert(make_pair(fracture.Id, actualVert));
     }
-
+    cout << fracture.NumberFractures << endl;
+    file.close();
     return true;
 }
 }
