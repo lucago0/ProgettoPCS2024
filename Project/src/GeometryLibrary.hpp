@@ -3,13 +3,12 @@
 #include <vector>
 #include <Eigen/Eigen>
 
-using namespace std;
-using namespace Eigen;
 
 namespace FracturesLib{
 
 struct Fractures{
     unsigned int NumberFractures = 0;
+    unsigned int Id;
     map<unsigned int, vector<array<double, 3>>> Vertices;
     double tol = numeric_limits<double>::epsilon(); // precisione
     double tol_aree = tol*tol/2;
