@@ -59,7 +59,6 @@ bool importFracture(const string& filename, Fractures& fracture) {
     return true;
 }
 
-<<<<<<< Updated upstream
 void OutputFile(Traces& TR, Fractures& FR)
 {
     string nameFileO = "Traces.txt";
@@ -107,7 +106,6 @@ void OutputFile(Traces& TR, Fractures& FR)
 
 }
 
-=======
 double distanceSquared(Vector3d& A, Vector3d& B){
     return pow(A[0]-B[0],2) + pow(A[1]-B[1],2) + pow(A[2]-B[2],2);
 }
@@ -148,5 +146,4 @@ bool areClose(Fractures& mesh, unsigned int& Id1, unsigned int& Id2){
 
     return distanceSquared(C1,C2) <= pow(R1+R2,2);
 }
->>>>>>> Stashed changes
 }

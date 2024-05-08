@@ -28,5 +28,7 @@ bool importFracture(const string& filename, Fractures& fracture);
 
 bool areClose(unsigned int Id1, unsigned int Id2);
 
+void OutputFile(Traces& TR, Fractures& FR);
+
 double distanceSquared(Fractures& mesh, array<double,3> P1, array<double,3> P2);
 };
