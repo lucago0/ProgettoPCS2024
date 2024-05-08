@@ -43,12 +43,16 @@ bool importFracture(const string& filename, Fractures& fracture) {
                 actualVert(j, i) = stod(val);
             }
         }
-        file >> pv; //per gestire la fine con lo spazio vuoto
+        file >> pv;
 
         // Add fracture data to the fractures map
         fracture.Vertices.insert(make_pair(fracture.Id, actualVert));
     }
     cout << fracture.NumberFractures << endl;
+    for (const auto& pair : fracture.Vertices) {
+        std::cout << "Chiave: " << pair.first << ", Valore: " << pair.second << std::endl;
+    }
+
     file.close();
     return true;
 }

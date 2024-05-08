@@ -53,6 +53,14 @@ list(APPEND ${CMAKE_PROJECT_NAME}_TEST_sources ${src_test_sources})
 list(APPEND ${CMAKE_PROJECT_NAME}_TEST_headers ${src_test_headers})
 list(APPEND ${CMAKE_PROJECT_NAME}_TEST_includes ${src_test_includes})
 
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/FR3_data.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/FR10_data.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/FR50_data.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/FR82_data.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/FR200_data.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/FR362_data.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 # Create executable
 ################################################################################
 add_executable(${PROJECT_NAME}
