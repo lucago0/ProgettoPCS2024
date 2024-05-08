@@ -56,4 +56,52 @@ bool importFracture(const string& filename, Fractures& fracture) {
     file.close();
     return true;
 }
+
+void OutputFile(Traces& TR, Fractures& FR)
+{
+    string nameFileO = "Traces.txt";
+    ofstream ofs(nameFileO);
+
+    if (ofs.fail())
+    {
+        cout << "Impossibile creare il file di output" << endl;
+        return;
+    }
+
+    ofs << "# Number of Traces" << endl;
+    ofs << TR.FracturesId.size() << endl;
+    ofs << "# TraceId; FracturesId1; FracturesId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
+
+    for(unsigned int i = 0; i < TR.FracturesId.size();i++)
+    {
+        ofs << i+1 << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i][0] << ";" << TR.Vertices[i][1] << ";" << TR.Vertices[i][2] << endl;
+    }
+
+    map<unsigned int, unsigned int> FracTrace;
+
+    for(unsigned int i = 0; i < FR.NumberFractures; i++)
+    {
+        for(unsigned int j = 0; j < TR.FracturesId.size(); j++)
+        {
+            if(i == TR.FracturesId[j][0] || i == TR.FracturesId[j][1])
+            {
+                FracTrace[i] += 1;
+            }
+        }
+    }
+
+    ofs << "# FractureId; NumTraces" << endl;
+    for(unsigned int i = 0; i < FR.NumberFractures; i++)
+    {
+        ofs << i << ";" << FracTrace[i] << endl;
+    }
+
+    ofs << "# TraceId; Tips; Length" << endl;
+    for(unsigned int i = 0; i < TR.FracturesId.size();i++)
+    {
+        ofs << i << ";" << TR.Tips << sqrt(distanceSquared(TR.Vertices[0],TR.Vertices[1])) << endl;
+    }
+
+}
+
 }
