@@ -13,6 +13,8 @@ struct Fractures{
     unsigned int NumberFractures = 0;
     unsigned int Id;
     map<unsigned int, Matrix<double, 3, Dynamic>> Vertices;
+    double tol = numeric_limits<double>::epsilon(); // precisione
+    double tol_aree = tol*tol/2;
 };
 
 struct Traces{
@@ -24,4 +26,7 @@ struct Traces{
 
 bool importFracture(const string& filename, Fractures& fracture);
 
+bool areClose(unsigned int Id1, unsigned int Id2);
+
+double distanceSquared(Fractures& mesh, array<double,3> P1, array<double,3> P2);
 };

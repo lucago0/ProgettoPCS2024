@@ -4,6 +4,8 @@
 #include <iostream>
 #include <array>
 #include <vector>
+#include <cmath>
+#include <algorithm>
 
 using namespace std;
 using namespace Eigen;
@@ -57,6 +59,7 @@ bool importFracture(const string& filename, Fractures& fracture) {
     return true;
 }
 
+<<<<<<< Updated upstream
 void OutputFile(Traces& TR, Fractures& FR)
 {
     string nameFileO = "Traces.txt";
@@ -104,4 +107,46 @@ void OutputFile(Traces& TR, Fractures& FR)
 
 }
 
+=======
+double distanceSquared(Vector3d& A, Vector3d& B){
+    return pow(A[0]-B[0],2) + pow(A[1]-B[1],2) + pow(A[2]-B[2],2);
+}
+
+bool areClose(Fractures& mesh, unsigned int& Id1, unsigned int& Id2){
+
+    Vector3d C1;
+    const unsigned int n1 = mesh.Vertices[Id1].cols();
+    Vector3d C2;
+    const unsigned int n2 = mesh.Vertices[Id2].cols();
+
+    for(unsigned int i=0; i<3; i++){
+        for (unsigned int j=0; j<n1; j++){
+            C1[i] += mesh.Vertices[Id1](j,i);
+        }
+        C1[i] /= n1;
+        for (unsigned int j=0; j<n2; j++){
+            C2[i] += mesh.Vertices[Id2](j,i);
+        }
+        C2[i] /= n2;
+    }
+
+    VectorXd rays1;
+    for(unsigned int i=0; i<n1; i++){
+        rays1.resize(rays1.size() + 1);
+        Vector3d point = mesh.Vertices[Id1].col(i);
+        rays1(rays1.size() - 1) = distanceSquared(C1,point);
+    }
+    VectorXd rays2;
+    for(unsigned int i=0; i<n2; i++){
+        rays2.resize(rays2.size() + 1);
+        Vector3d point = mesh.Vertices[Id2].col(i);
+        rays2(rays2.size() - 1) = distanceSquared(C2,point);
+    }
+
+    double R1 = *max_element(rays1.begin(), rays1.end());
+    double R2 = *max_element(rays2.begin(), rays2.end());
+
+    return distanceSquared(C1,C2) <= pow(R1+R2,2);
+}
+>>>>>>> Stashed changes
 }
