@@ -13,8 +13,12 @@ struct Fractures{
     unsigned int NumberFractures = 0;
     unsigned int Id;
     map<unsigned int, Matrix<double, 3, Dynamic>> Vertices;
+<<<<<<< Updated upstream
     double tol = numeric_limits<double>::epsilon(); // precisione
     double tol_aree = tol*tol/2;
+=======
+    map<unsigned int, array<double,4>> Coeff;
+>>>>>>> Stashed changes
 };
 
 struct Traces{
@@ -22,6 +26,14 @@ struct Traces{
     map<unsigned int, array<unsigned int, 2>> FracturesId;
     map<unsigned int, Vector3d> Vertices;
     bool Tips;
+};
+
+struct Line{
+    unsigned int Id;
+    unsigned int Id1;
+    unsigned int Id2;
+    map<unsigned int, array<array<double,3>,array<double,3>>> EqLine
+
 };
 
 bool importFracture(const string& filename, Fractures& fracture);

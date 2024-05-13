@@ -110,6 +110,7 @@ void OutputFile(Traces& TR, Fractures& FR)
 
 }
 
+<<<<<<< Updated upstream
 bool areClose(Fractures& mesh, unsigned int& Id1, unsigned int& Id2){
 
     Vector3d C1;
@@ -146,4 +147,53 @@ bool areClose(Fractures& mesh, unsigned int& Id1, unsigned int& Id2){
 
     return distanceSquared(C1,C2) <= pow(R1+R2,2);
 }
+=======
+map<unsigned int, array<double,4>> Piano(Fractures& FR)
+{
+    for(unsigned int i = 0; i < FR.NumberFractures; i++)
+    {
+        Vector3d v0 = FR.Vertices[i].col(1);
+        Vector3d v1 = FR.Vertices[i].col(2);
+        Vector3d v2 = FR.Vertices[i].col(3);
+
+        map<unsigned int, array<double, 4>> coeff;
+
+        coeff[i][0] = (v1[1]-v0[1])*(v2[2]-v0[2]) - (v1[2]-v0[2])*(v2[1]-v0[1]);
+        coeff[i][1] = -((v1[0]-v0[0])*(v2[2]-v0[2])-(v2[0]-v0[0])*(v1[2]-v0[2]));
+        coeff[i][2] = (v1[0]-v0[0])*(v1[1]-v0[1])-(v2[0]-v0[0])*(v1[1]-v0[1]);
+        coeff[i][3] = -coeff[i][0]*v0[0]-coeff[i][1]*v0[1]-coeff[i][2]*v0[2];
+
+        return coeff;
+
+    }
+>>>>>>> Stashed changes
 }
+
+array<double,6> Inter(Fractures& FR, unsigned int& id1, unsigned int& id2)
+{
+     Vector3d v1;
+     Vector3d v2;
+     for(unsigned int i = 0; i < 3; i++)
+     {v1[i] = FR.Coeff[id1][i];
+     v2[i] = FR.Coeff[id2][i];}
+
+     array<double,6> vect;
+
+     vect[0] = v1[1]*v2[2] - v1[2]*v2[1];
+     vect[1] = v1[2]*v2[0] - v1[0]*v2[2];
+     vect[2] = v1[0]*v2[1] - v1[1]*v2[0];
+
+     if(v2[2] != 0 && v1[2] != 0)
+     {
+         Matrix<double,2,2> M;
+         M << v1[0], v1[1],
+                 v2[0],v2[1];
+         Vector2d b = {FR.Coeff[id1][3],FR.Coeff[id2][3]};
+         Vector2d P = M.lu().solve(b);
+         vect[3] = P[0];
+         vect[4] = P[1];
+     }
+}
+}
+
+
