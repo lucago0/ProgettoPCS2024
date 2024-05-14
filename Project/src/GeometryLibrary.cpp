@@ -204,9 +204,9 @@ array<double,4> intersection(const double& a, const double& b, const double& c, 
     if (sx > dx) {
         sx = dx = numeric_limits<double>::quiet_NaN(); // Non un numero
     }
-    double other_sx = (a < c) ? a : c;
-    double other_dx = (d > b) ? d : b;
-    array<double,4> output = {sx,dx,other_sx,other_dx};
+    double other_sx = (a < c) ? a : c; // other_sx è pari ad a se a<c, altrimenti è pari a c
+    double other_dx = (d > b) ? d : b; // other_dx è pari a d se d>b, altrimenti è pari a b
+    array<double,4> output = {sx,dx,other_sx,other_dx}; // in ordine restituiamo l'intervallo di intersezione e gli altri due estremi ordinati
     return output;
 }
 
