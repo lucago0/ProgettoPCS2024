@@ -13,5 +13,14 @@ int main()
     {
         return 1;
     }
+
+
+    /* Per la funzione che associa a una retta r e a uno
+     * scalare t il valore P+tv (dove P è il punto iniziale
+     * e v la sua direzione) scriviamo
+     * array<double,3> P = r.point + t*r.direction */
+
     return 0;
+
+
 }

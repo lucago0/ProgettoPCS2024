@@ -110,7 +110,7 @@ void OutputFile(Traces& TR, Fractures& FR)
 
 }
 
-<<<<<<< Updated upstream
+
 bool areClose(Fractures& mesh, unsigned int& Id1, unsigned int& Id2){
 
     Vector3d C1;
@@ -147,7 +147,7 @@ bool areClose(Fractures& mesh, unsigned int& Id1, unsigned int& Id2){
 
     return distanceSquared(C1,C2) <= pow(R1+R2,2);
 }
-=======
+
 map<unsigned int, array<double,4>> Piano(Fractures& FR)
 {
     for(unsigned int i = 0; i < FR.NumberFractures; i++)
@@ -166,7 +166,6 @@ map<unsigned int, array<double,4>> Piano(Fractures& FR)
         return coeff;
 
     }
->>>>>>> Stashed changes
 }
 
 array<double,6> Inter(Fractures& FR, unsigned int& id1, unsigned int& id2)
@@ -194,6 +193,23 @@ array<double,6> Inter(Fractures& FR, unsigned int& id1, unsigned int& id2)
          vect[4] = P[1];
      }
 }
+
+array<double,4> intersection(const double& a, const double& b, const double& c, const double& d){
+    vector<double> v = {a,b,c,d};
+    // Calcola l'estremo sinistro dell'intersezione
+    double sx = max(a, c);
+    // Calcola l'estremo destro dell'intersezione
+    double dx = min(b, d);
+    // Se gli intervalli non si sovrappongono, l'intersezione sarà vuota
+    if (sx > dx) {
+        sx = dx = numeric_limits<double>::quiet_NaN(); // Non un numero
+    }
+    double other_sx = (a < c) ? a : c;
+    double other_dx = (d > b) ? d : b;
+    array<double,4> output = {sx,dx,other_sx,other_dx};
+    return output;
+}
+
 }
 
 

@@ -13,12 +13,9 @@ struct Fractures{
     unsigned int NumberFractures = 0;
     unsigned int Id;
     map<unsigned int, Matrix<double, 3, Dynamic>> Vertices;
-<<<<<<< Updated upstream
     double tol = numeric_limits<double>::epsilon(); // precisione
     double tol_aree = tol*tol/2;
-=======
     map<unsigned int, array<double,4>> Coeff;
->>>>>>> Stashed changes
 };
 
 struct Traces{
@@ -29,11 +26,9 @@ struct Traces{
 };
 
 struct Line{
-    unsigned int Id;
-    unsigned int Id1;
-    unsigned int Id2;
-    map<unsigned int, array<array<double,3>,array<double,3>>> EqLine
-
+    unsigned int id;
+    array<double,3> point;
+    array<double,3> direction;
 };
 
 bool importFracture(const string& filename, Fractures& fracture);
@@ -41,6 +36,8 @@ bool importFracture(const string& filename, Fractures& fracture);
 bool areClose(unsigned int Id1, unsigned int Id2);
 
 void OutputFile(Traces& TR, Fractures& FR);
+
+
 
 double distanceSquared(Fractures& mesh, array<double,3> P1, array<double,3> P2);
 };
