@@ -7,12 +7,24 @@ using namespace FracturesLib;
 
 int main()
 {
-    Fractures fracture;
+    Fractures fractures;
     string filepath = "./FR362_data.txt";
-    if(!importFracture(filepath, fracture))
+    if(!importFracture(filepath, fractures))
     {
         return 1;
     }
+
+
+    for (unsigned int id1 = 0; i<fractures.NumberFractures; id1++) {
+        for (unsigned int id2 = id1+1; i<fractures.NumberFractures; id2++) {
+            if areClose(fractures,id1,id2){
+
+            }
+
+        }
+    }
+
+
 
     /* Per la funzione che associa a una retta r e a uno
      * scalare t il valore P+tv (dove P è il punto iniziale

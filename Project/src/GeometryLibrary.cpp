@@ -106,8 +106,46 @@ void OutputFile(Traces& TR, Fractures& FR)
 
 }
 
+bool areClose(Fractures& mesh, unsigned int& Id1, unsigned int& Id2){
 
-Matrix<unsigned int, Dynamic,2> areClose(Fractures& frac){
+    Vector3d C1;
+    const unsigned int n1 = mesh.Vertices[Id1].cols();
+    Vector3d C2;
+    const unsigned int n2 = mesh.Vertices[Id2].cols();
+
+    for(unsigned int i=0; i<3; i++){
+        for (unsigned int j=0; j<n1; j++){
+            C1[i] += mesh.Vertices[Id1](j,i);
+        }
+        C1[i] /= n1;
+        for (unsigned int j=0; j<n2; j++){
+            C2[i] += mesh.Vertices[Id2](j,i);
+        }
+        C2[i] /= n2;
+    }
+
+    VectorXd rays1;
+    for(unsigned int i=0; i<n1; i++){
+        rays1.resize(rays1.size() + 1);
+        Vector3d point = mesh.Vertices[Id1].col(i);
+        rays1(rays1.size() - 1) = distanceSquared(C1,point);
+    }
+    VectorXd rays2;
+    for(unsigned int i=0; i<n2; i++){
+        rays2.resize(rays2.size() + 1);
+        Vector3d point = mesh.Vertices[Id2].col(i);
+        rays2(rays2.size() - 1) = distanceSquared(C2,point);
+    }
+
+    double R1 = *max_element(rays1.begin(), rays1.end());
+    double R2 = *max_element(rays2.begin(), rays2.end());
+
+    return distanceSquared(C1,C2) <= pow(R1+R2,2);
+}
+
+
+
+/* Matrix<unsigned int, Dynamic,2> areClose(Fractures& frac){
 
     Matrix<unsigned int, Dynamic,2> Temp;
 
@@ -147,59 +185,70 @@ Matrix<unsigned int, Dynamic,2> areClose(Fractures& frac){
             double R1 = *max_element(rays1.begin(), rays1.end());
             double R2 = *max_element(rays2.begin(), rays2.end());
 
-            if distanceSquared(C1,C2) <= pow(R1+R2,2){
+            if (distanceSquared(C1,C2) <= pow(R1+R2,2)){
                     Temp = Temp.append(Vector2d(Id1,Id2));
                 };
         }
         }
     return Temp;
+} */
+
+// Matrix<unsigned int, dynamic, 2> FrClose = areClose(Fractures& frac); //matrice con gli Id delle fratture che possono intersecarsi
+
+array<double,4> Piano(unsigned int& id, Fractures& FR)
+{
+
+    Vector3d v0 = FR.Vertices[id].col(1);
+    Vector3d v1 = FR.Vertices[id].col(2);
+    Vector3d v2 = FR.Vertices[id].col(3);
+
+    array<double, 4> coeff = {0,0,0,0};
+
+    coeff[0] = (v1[1]-v0[1])*(v2[2]-v0[2]) - (v1[2]-v0[2])*(v2[1]-v0[1]);
+    coeff[1] = -((v1[0]-v0[0])*(v2[2]-v0[2])-(v2[0]-v0[0])*(v1[2]-v0[2]));
+    coeff[2] = (v1[0]-v0[0])*(v1[1]-v0[1])-(v2[0]-v0[0])*(v1[1]-v0[1]);
+    coeff[3] = -coeff[0]*v0[0]-coeff[1]*v0[1]-coeff[2]*v0[2];
+
+    return coeff;
 }
 
-Matrix<unsigned int, dynamic, 2> FrClose = areClose(Fractures& frac); //matrice con gli Id delle fratture che possono intersecarsi
-
-map<unsigned int, array<double,4>> Piano(Fractures& FR)
+array<double,6> Inter(array<double,4>& coeff1, array<double,4>& coeff2)
 {
-    map<unsigned int, array<double, 4>> coeff;
+    Vector3d v1;
+    Vector3d v2;
+    for(unsigned int i = 0; i < 3; i++)
+    {v1[i] = coeff1[i];
+        v2[i] = coeff2[i];}
 
-    for(unsigned int i = 0; i < FR.NumberFractures; i++)
+    array<double,6> vect = {0,0,0,0,0,0};
+
+    vect[0] = v1[1]*v2[2] - v1[2]*v2[1];
+    vect[1] = v1[2]*v2[0] - v1[0]*v2[2];
+    vect[2] = v1[0]*v2[1] - v1[1]*v2[0];
+
+    if(v2[2] != 0 || v1[2] != 0)
     {
-        Vector3d v0 = FR.Vertices[i].col(1);
-        Vector3d v1 = FR.Vertices[i].col(2);
-        Vector3d v2 = FR.Vertices[i].col(3);
-
-        coeff[i][0] = (v1[1]-v0[1])*(v2[2]-v0[2]) - (v1[2]-v0[2])*(v2[1]-v0[1]);
-        coeff[i][1] = -((v1[0]-v0[0])*(v2[2]-v0[2])-(v2[0]-v0[0])*(v1[2]-v0[2]));
-        coeff[i][2] = (v1[0]-v0[0])*(v1[1]-v0[1])-(v2[0]-v0[0])*(v1[1]-v0[1]);
-        coeff[i][3] = -coeff[i][0]*v0[0]-coeff[i][1]*v0[1]-coeff[i][2]*v0[2];
-        return coeff;
+        Matrix<double,2,2> M;
+        M << v1[0], v1[1],
+            v2[0],v2[1];
+        Vector2d b = {coeff1[3],coeff2[3]};
+        Vector2d P = M.lu().solve(b);
+        vect[3] = P[0];
+        vect[4] = P[1];
     }
-}
+    else if(v2[1] != 0 || v1[1] != 0)
+    {
+        Matrix<double,2,2> M;
+        M << v1[0], v1[2],
+            v2[0],v2[2];
+        Vector2d b = {coeff1[3],coeff2[3]};
+        Vector2d P = M.lu().solve(b);
+        vect[3] = P[0];
+        vect[4] = P[1];
+    }
+    else
 
-array<double,6> Inter(Fractures& FR, unsigned int& id1, unsigned int& id2)
-{
-     Vector3d v1;
-     Vector3d v2;
-     for(unsigned int i = 0; i < 3; i++)
-     {v1[i] = FR.Coeff[id1][i];
-     v2[i] = FR.Coeff[id2][i];}
-
-     array<double,6> vect;
-
-     vect[0] = v1[1]*v2[2] - v1[2]*v2[1];
-     vect[1] = v1[2]*v2[0] - v1[0]*v2[2];
-     vect[2] = v1[0]*v2[1] - v1[1]*v2[0];
-
-     if(v2[2] != 0 && v1[2] != 0)
-     {
-         Matrix<double,2,2> M;
-         M << v1[0], v1[1],
-                 v2[0],v2[1];
-         Vector2d b = {FR.Coeff[id1][3],FR.Coeff[id2][3]};
-         Vector2d P = M.lu().solve(b);
-         vect[3] = P[0];
-         vect[4] = P[1];
-     }
-}
+    }
 
 Matrix<double,4,4> PuntoIntersRetta(const struct Fractures& fracture){
     double t;

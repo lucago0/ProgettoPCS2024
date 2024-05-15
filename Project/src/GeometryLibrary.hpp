@@ -26,7 +26,6 @@ struct Traces{
 };
 
 struct Line{
-    unsigned int id;
     array<double,3> point;
     array<double,3> direction;
 };
