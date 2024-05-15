@@ -155,8 +155,6 @@ Matrix<unsigned int, Dynamic,2> areClose(Fractures& frac){
     return Temp;
 }
 
-Matrix<unsigned int, dynamic, 2> FrClose = areClose(Fractures& frac); //matrice con gli Id delle fratture che possono intersecarsi
-
 map<unsigned int, array<double,4>> Piano(Fractures& FR)
 {
     map<unsigned int, array<double, 4>> coeff;
@@ -201,12 +199,13 @@ array<double,6> Inter(Fractures& FR, unsigned int& id1, unsigned int& id2)
      }
 }
 
-Matrix<double,4,4> PuntoIntersRetta(const struct Fractures& fracture){
+
+//FRClose matrice con gli Id delle fratture che possono intersecarsi, restituita da areClose
+Matrix<double,4,4> PuntoIntersRetta(const struct Fractures& fracture, Matrix<unsigned int, dynamic, 2>& FrClose){
     double t;
     double s;
     Vector3d Qtemp;
     Matrix<double,4,4> Q; //matrice dei punti di intersezione
-
 
     unsigned int NumRow = FRClose.rows();
 
