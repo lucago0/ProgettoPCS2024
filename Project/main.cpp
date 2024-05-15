@@ -15,8 +15,8 @@ int main()
     }
 
 
-    for (unsigned int id1 = 0; i<fractures.NumberFractures; id1++) {
-        for (unsigned int id2 = id1+1; i<fractures.NumberFractures; id2++) {
+    for (unsigned int id1 = 0; id1<fractures.NumberFractures; id1++) {
+        for (unsigned int id2 = id1+1; id2<fractures.NumberFractures; id2++) {
             if areClose(fractures,id1,id2){
 
             }
