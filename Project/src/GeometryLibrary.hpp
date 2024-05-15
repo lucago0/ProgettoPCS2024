@@ -3,6 +3,8 @@
 #include <vector>
 #include <array>
 #include <Eigen/Eigen>
+#include <map>
+
 
 using namespace std;
 using namespace Eigen;
@@ -30,13 +32,14 @@ struct Line{
     array<double,3> direction;
 };
 
+
 bool importFracture(const string& filename, Fractures& fracture);
-
-bool areClose(unsigned int Id1, unsigned int Id2);
-
+double distanceSquared(Vector3d& A, Vector3d& B);
 void OutputFile(Traces& TR, Fractures& FR);
+bool areClose(Fractures& mesh, unsigned int& Id1, unsigned int& Id2);
+array<double,4> Piano(unsigned int& id, Fractures& FR);
+array<double,6> Inter(array<double,4>& coeff1, array<double,4>& coeff2);
+Matrix<double,4,4> PuntiIntersRetta(Fractures& fracture, unsigned int& Id1, unsigned int& Id2, array<double,6>& v);
+array<double,4> intersection(const Matrix<double,4,4>&Q);
 
-
-
-double distanceSquared(Fractures& mesh, array<double,3> P1, array<double,3> P2);
 };
