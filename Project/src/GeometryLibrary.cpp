@@ -212,7 +212,11 @@ array<double,4> Piano(unsigned int& id, Fractures& FR)
     return coeff;
 }
 
+<<<<<<< HEAD
 array<double,6> Inter(array<double,4>& coeff1, array<double,4>& coeff2)
+=======
+map<unsigned int, array<double,4>> Piano(Fractures& FR)
+>>>>>>> f7e42db45ee0486f8ae438b5faa5ed639d464bd4
 {
     Vector3d v1;
     Vector3d v2;
@@ -250,12 +254,13 @@ array<double,6> Inter(array<double,4>& coeff1, array<double,4>& coeff2)
 
     }
 
-Matrix<double,4,4> PuntoIntersRetta(const struct Fractures& fracture){
+
+//FRClose matrice con gli Id delle fratture che possono intersecarsi, restituita da areClose
+Matrix<double,4,4> PuntoIntersRetta(const struct Fractures& fracture, Matrix<unsigned int, dynamic, 2>& FrClose){
     double t;
     double s;
     Vector3d Qtemp;
     Matrix<double,4,4> Q; //matrice dei punti di intersezione
-
 
     unsigned int NumRow = FRClose.rows();
 
