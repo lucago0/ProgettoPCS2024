@@ -22,11 +22,11 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};${CMAKE_CURRENT_SOURCE_DIR}/../extern
 
 ## Eigen3
 find_package(Eigen3 CONFIG REQUIRED)
-list(APPEND ${CMAKE_PROJECT_NAME}_LINKED_LIBRARIES PUBLIC Eigen3::Eigen)
+list(APPEND DFN_LINKED_LIBRARIES PUBLIC Eigen3::Eigen)
 
 ## Threads
 find_package(Threads REQUIRED)
-list(APPEND ${CMAKE_PROJECT_NAME}_LINKED_LIBRARIES PRIVATE Threads::Threads)
+list(APPEND DFN_LINKED_LIBRARIES PRIVATE Threads::Threads)
 
 ## GTest
 find_package(GTest REQUIRED)
@@ -61,6 +61,18 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/FR82_data.txt DESTINATION ${CMAKE_CURRENT_
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/FR200_data.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/FR362_data.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
+list(APPEND DFN_LINKED_LIBRARIES PRIVATE GTest::gtest)
+list(APPEND DFN_LINKED_LIBRARIES PRIVATE GTest::gtest_main)
+list(APPEND DFN_LINKED_LIBRARIES PRIVATE GTest::gmock)
+list(APPEND DFN_LINKED_LIBRARIES PRIVATE GTest::gmock_main)
+
+# Insert Sources
+################################################################################
+
+list(APPEND DFN_SOURCES ${DFN_sources})
+list(APPEND DFN_HEADERS ${DFN_headers})
+list(APPEND DFN_INCLUDE ${DFN_includes})
+
 # Create executable
 ################################################################################
 add_executable(${PROJECT_NAME}
@@ -83,3 +95,9 @@ add_executable(${CMAKE_PROJECT_NAME}_TEST
 target_include_directories(${CMAKE_PROJECT_NAME}_TEST PUBLIC ${${CMAKE_PROJECT_NAME}_includes} ${${CMAKE_PROJECT_NAME}_TEST_includes})
 target_link_libraries(${CMAKE_PROJECT_NAME}_TEST PUBLIC ${${CMAKE_PROJECT_NAME}_LINKED_LIBRARIES})
 target_compile_options(${CMAKE_PROJECT_NAME}_TEST PUBLIC -fPIC)
+
+
+target_link_libraries(${PROJECT_NAME} ${DFN_LINKED_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${DFN_INCLUDE})
+target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
+

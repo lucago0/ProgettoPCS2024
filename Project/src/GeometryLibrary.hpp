@@ -26,9 +26,16 @@ struct Traces{
 };
 
 struct Line{
+<<<<<<< Updated upstream
     unsigned int id;
     array<double,3> point;
     array<double,3> direction;
+=======
+    unsigned int Id;
+    unsigned int Id1;
+    unsigned int Id2;
+    map<unsigned int, array<array<double,3>,array<double,3>>> EqLine;
+>>>>>>> Stashed changes
 };
 
 bool importFracture(const string& filename, Fractures& fracture);
