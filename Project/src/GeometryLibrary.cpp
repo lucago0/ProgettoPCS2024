@@ -1,4 +1,3 @@
-
 #include <GeometryLibrary.hpp>
 #include <fstream>
 #include <sstream>
@@ -10,7 +9,7 @@
 #include <Eigen/Dense>
 #include <map>
 
-    using namespace std;
+using namespace std;
 using namespace Eigen;
 
 namespace FracturesLib{
@@ -201,7 +200,6 @@ Line Inter(Vector4d& coeff1, Vector4d& coeff2)
 
     return line;
 }
-
 
 VectorXd PuntiIntersRetta(Line& r, Line& rj){  //primi 3 punto di inters. poi t e s
     VectorXd Q;

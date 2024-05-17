@@ -13,17 +13,16 @@ namespace FracturesLib{
 
 struct Fractures{
     unsigned int NumberFractures = 0;
-    unsigned int Id;
     map<unsigned int, Matrix<double, 3, Dynamic>> Vertices;
     double tol = numeric_limits<double>::epsilon(); // precisione
     double tol_aree = tol*tol/2;
 };
 
 struct Traces{
-    unsigned int Id;
+    unsigned int NumberTraces = 0;
     map<unsigned int, array<unsigned int, 2>> FracturesId;
     map<unsigned int, Vector3d> Vertices;
-    bool Tips;
+    map<unsigned int, bool> Tips;
 };
 
 struct Line{
