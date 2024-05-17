@@ -104,7 +104,7 @@ void OutputFile(Traces& TR, Fractures& FR)
     ofs << "# TraceId; Tips; Length" << endl;
     for(unsigned int i = 0; i < TR.NumberTraces;i++)
     {
-        ofs << i << ";" << TR.Tips[i] << ";" sqrt(distanceSquared(TR.Vertices[0].col(0),TR.Vertices[1].col(1))) << endl;
+        ofs << i << ";" << TR.Tips[i] << ";" << sqrt(distanceSquared(TR.Vertices[0].col(0),TR.Vertices[1].col(1))) << endl;
     }
 
 }
