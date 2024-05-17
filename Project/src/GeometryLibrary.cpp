@@ -61,52 +61,53 @@ double distanceSquared(const Vector3d& A,const Vector3d& B){
     return pow(A[0]-B[0],2) + pow(A[1]-B[1],2) + pow(A[2]-B[2],2);
 }
 
-// void OutputFile(const Traces& TR, const Fractures& FR)
-// {
-//     string nameFileO = "Traces.txt";
-//     ofstream ofs(nameFileO);
+void OutputFile(Traces& TR, Fractures& FR)
+{
+    string nameFileO = "Traces.txt";
+    ofstream ofs(nameFileO);
 
-//     if (ofs.fail())
-//     {
-//         cout << "Impossibile creare il file di output" << endl;
-//         return;
-//     }
+    if (ofs.fail())
+    {
+        cout << "Impossibile creare il file di output" << endl;
+        return;
+    }
 
-//     ofs << "# Number of Traces" << endl;
-//     ofs << TR.FracturesId.size() << endl;
-//     ofs << "# TraceId; FracturesId1; FracturesId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
+    ofs << "# Number of Traces" << endl;
+    ofs << TR.NumberTraces << endl;
+    ofs << "# TraceId; FracturesId1; FracturesId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
 
-//     for(unsigned int i = 0; i < TR.FracturesId.size();i++)
-//     {
-//         ofs << i+1 << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i][0] << ";" << TR.Vertices[i][1] << ";" << TR.Vertices[i][2] << endl;
-//     }
+    for(unsigned int i = 0; i < TR.NumberTraces;i++)
+    {
+        ofs << i+1 << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
+        cout << i+1 << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
+    }
 
-//     map<unsigned int, unsigned int> FracTrace;
+    map<unsigned int, unsigned int> FracTrace;
 
-//     for(unsigned int i = 0; i < FR.NumberFractures; i++)
-//     {
-//         for(unsigned int j = 0; j < TR.FracturesId.size(); j++)
-//         {
-//             if(i == TR.FracturesId[j][0] || i == TR.FracturesId[j][1])
-//             {
-//                 FracTrace[i] += 1;
-//             }
-//         }
-//     }
+    for(unsigned int i = 0; i < FR.NumberFractures; i++)
+    {
+        for(unsigned int j = 0; j < TR.NumberTraces; j++)
+        {
+            if(i == TR.FracturesId[j][0] || i == TR.FracturesId[j][1])
+            {
+                FracTrace[i] += 1;
+            }
+        }
+    }
 
-//     ofs << "# FractureId; NumTraces" << endl;
-//     for(unsigned int i = 0; i < FR.NumberFractures; i++)
-//     {
-//         ofs << i << ";" << FracTrace[i] << endl;
-//     }
+    ofs << "# FractureId; NumTraces" << endl;
+    for(unsigned int i = 0; i < FR.NumberFractures; i++)
+    {
+        ofs << i << ";" << FracTrace[i] << endl;
+    }
 
-//     ofs << "# TraceId; Tips; Length" << endl;
-//     for(unsigned int i = 0; i < TR.FracturesId.size();i++)
-//     {
-//         ofs << i << ";" << TR.Tips << sqrt(distanceSquared(TR.Vertices[0],TR.Vertices[1])) << endl;
-//     }
+    ofs << "# TraceId; Tips; Length" << endl;
+    for(unsigned int i = 0; i < TR.NumberTraces;i++)
+    {
+        ofs << i << ";" << TR.Tips[i] << ";" sqrt(distanceSquared(TR.Vertices[0].col(0),TR.Vertices[1].col(1))) << endl;
+    }
 
-// }
+}
 
 bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
     Vector3d C1;
