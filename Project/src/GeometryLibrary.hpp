@@ -21,7 +21,7 @@ struct Fractures{
 struct Traces{
     unsigned int NumberTraces = 0;
     map<unsigned int, array<unsigned int, 2>> FracturesId;
-    map<unsigned int, Matrix<double, 3,2>> Vertices;
+    map<unsigned int, Matrix<double,3,2>> Vertices;
     map<unsigned int, bool> Tips;
 };
 
@@ -32,12 +32,12 @@ struct Line{
 
 
 bool importFracture(const string& filename, Fractures& fracture);
-double distanceSquared(const Vector3d& A, const Vector3d& B);
-void OutputFile(const struct Traces& TR, Fractures& FR);
-bool areClose(Fractures& mesh, unsigned int& Id1, unsigned int& Id2);
+double distanceSquared(const Vector3d& A,const Vector3d& B);
+void OutputFile(const Traces& TR, const Fractures& FR);
+bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2);
 Vector4d Piano(unsigned int& id, Fractures& FR);
-Line Inter(const Vector4d& coeff1, const Vector4d& coeff2);
-VectorXd PuntiIntersRetta(const Line& r, Line& rj);
+Line Inter(const Vector4d &coeff1, const Vector4d &coeff2);
+VectorXd PuntiIntersRetta(const Line& r,const Line& rj);
 Vector4d intersection(const Matrix<double,4,4>&Q);
 
 };
