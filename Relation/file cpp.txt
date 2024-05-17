@@ -1,0 +1,47 @@
+#include "GeometryLibrary.hpp"
+#include <cmath>
+#include <algorithm>
+
+using namespace std;
+
+namespace FracturesLib{
+
+double distanceSquared(array<double,3> A, array<double,3> B){
+    return pow(A[0]-B[0],2) + pow(A[1]-B[1],2) + pow(A[2]-B[2],2);
+};
+
+bool areClose(Fractures& mesh, unsigned int& Id1, unsigned int& Id2){
+
+    array<double,3> C1;
+    const unsigned int n1 = mesh.Vertices[Id1].size();
+    array<double,3> C2;
+    const unsigned int n2 = mesh.Vertices[Id2].size();
+
+    for(unsigned int i=0; i<3; i++){
+        for (unsigned int j=0; j<n1; j++){
+            C1[i] += mesh.Vertices[Id1][j][i];
+        }
+        C1[i] /= n1;
+        for (unsigned int j=0; j<n2; j++){
+            C2[i] += mesh.Vertices[Id2][j][i];
+        }
+        C2[i] /= n2;
+    }
+
+    vector<double> rays1;
+    rays1.reserve(n1);
+    for(unsigned int i=0; i<n1; i++){
+        rays1.push_back(distanceSquared(C1,mesh.Vertices[Id1][i]));
+    }
+    vector<double> rays2;
+    rays2.reserve(n2);
+    for(unsigned int i=0; i<n2; i++){
+        rays2.push_back(distanceSquared(C2,mesh.Vertices[Id2][i]));
+    }
+
+    double R1 = *max_element(rays1.begin(), rays2.end());
+    double R2 = *max_element(rays1.begin(), rays2.end());
+
+    return distanceSquared(C1,C2) <= pow(R1+R2,2);
+};
+}
