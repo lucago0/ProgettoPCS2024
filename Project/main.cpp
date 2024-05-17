@@ -14,41 +14,65 @@ int main()
         return 1;
     }
 
-    // for (unsigned int i=0;i<fractures.NumberFractures;i++){
-    //     array<double,4> coeff = Piano(i, fractures);
-    //     fractures.Coeff.insert(make_pair(fractures.Id, coeff));
-
+    Traces traces;
+    unsigned int numberTraces = 0;
     for (unsigned int id1 = 0; id1<fractures.NumberFractures; id1++) {
         for (unsigned int id2 = id1+1; id2<fractures.NumberFractures; id2++) {
             if (areClose(fractures,id1,id2)){
-                array<double,4> coeff1 = Piano(id1,fractures);
-                array<double,4> coeff2 = Piano(id2,fractures);
+                Vector4d coeff1 = Piano(id1,fractures);
+                Vector4d coeff2 = Piano(id2,fractures);
+                // piani non paralleli
                 Line r = Inter(coeff1,coeff2);
-                for (unsigned int j=0; j<fractures.Vertices[id1].rows(); j++){
-
+                Line r_j;
+                Matrix<double,4,4> intersectionPoints;
+                unsigned int points = 0;
+                for(unsigned int i = 0; i < 2; i++){
+                    unsigned int currentId = (i == 0) ? id1 : id2;
+                    for (unsigned int j=0; j<fractures.Vertices[currentId].rows()-1; j++){
+                        r_j.point(fractures.Vertices[currentId].col(j));
+                        r_j.direction(fractures.Vertices[currentId].col(j+1)-fractures.Vertices[currentId].col(j));
+                        // mi assicuro che ci sia intersezione tra r ed r_j con cross
+                        Vector4d Q = PuntiIntersRetta(r,r_j); // Q,t,s
+                        if (Q[4]>=0 && Q[4]<=1){ // Q[4] è s!!! e tau?
+                            intersectionPoints.col(points) = Q.head(4);
+                            points++;
+                        }
+                    }
                 }
+                points = 0;
+                numberTraces++;
+                Vector4d t = intersection(intersectionPoints);
+                t_star = intersectionPoints.row(3);
+                array<unsigned int,2> v = {id1,id2};
+                traces.FracturesId[numberTraces] = v;
+                Matrix<double,3,2> vertices;
+                vertices.col(0) = r.point + t[0]*r.direction;
+                vertices.col(1) = r.point + t[1]*r.direction;
+                traces.Vertices[numberTraces] = vertices;
 
+                // Tips
+                a = min(t_star[0],t_star[1]);
+                b = max(t_star[0],t_star[1]);
+                c = min(t_star[2],t_star[3]);
+                d = max(t_star[2],t_star[3]);
+                if (t[0] == a && t[1] == c){
+                    traces.Tips[numberTraces] = true;
+                }
+                else if (t[0] == a && t[1] == b){
+                    traces.Tips[numberTraces] = false;
+                }
+                else if (t[0] == b && t[1] == d){
+                    traces.Tips[numberTraces] = true;
+                }
+                else{
+                    traces.Tips[numberTraces] = false;
+                }
             }
-
         }
-
     }
+    traces.NumberTraces = numberTraces;
 
-    for (unsigned int id1 = 0; id1<fractures.NumberFractures; id1++) {
-        for (unsigned int id2 = id1+1; id2<fractures.NumberFractures; id2++) {
-            if (areClose(fractures,id1,id2)){
-                array<double,6> v = Inter(fractures.Coeff[id1],fractures.Coeff[id2]); //trova i coefficienti della retta di intersezione
-                                                                                      //in forma parametrica (vx,vy,vz, xbar, ybar, zbar)
-                Matrix<double, 4,4> Q = PuntiIntersRetta(fractures,id1,id2,v); //trova i punti di intersezione
-                array<double,4> inters = intersection(Q); //restuisce i punti ordinati
-                };
-            };
-        }
-
-    /* Per la funzione che associa a una retta r e a uno
-     * scalare t il valore P+tv (dove P è il punto iniziale
-     * e v la sua direzione) scriviamo
-     * array<double,3> P = r.point + t*r.direction */
+    OutputFile(traces,fractures);
 
     return 0;
 }

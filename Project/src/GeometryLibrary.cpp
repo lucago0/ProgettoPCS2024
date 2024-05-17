@@ -1,4 +1,3 @@
-.cpp
 
 #include <GeometryLibrary.hpp>
 #include <fstream>
@@ -254,7 +253,7 @@ VectorXd PuntiIntersRetta(Line& r, Line& rj){  //primi 3 punto di inters. poi t 
 return Q;
 }
 
-Vector4d intersection(const Matrix<double,4,4>&Q){
+Vector4d intersection(const Matrix<double,4,4>& Q){
     double a = Q(3,0);
     double b = Q(3,1);
     double c = Q(3,2);
