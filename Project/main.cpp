@@ -14,23 +14,24 @@ int main()
         return 1;
     }
 
-<<<<<<< Updated upstream
-    for (unsigned int i=0;i<fractures.NumberFractures;i++){
-        array<double,4> coeff = Piano(i, fractures);
-        fractures.Coeff.insert(make_pair(fractures.Id, coeff));
-=======
+    // for (unsigned int i=0;i<fractures.NumberFractures;i++){
+    //     array<double,4> coeff = Piano(i, fractures);
+    //     fractures.Coeff.insert(make_pair(fractures.Id, coeff));
 
-    for (unsigned int id1 = 0; i<fractures.NumberFractures; id1++) {
-        for (unsigned int id2 = id1+1; i<fractures.NumberFractures; id2++) {
+    for (unsigned int id1 = 0; id1<fractures.NumberFractures; id1++) {
+        for (unsigned int id2 = id1+1; id2<fractures.NumberFractures; id2++) {
             if (areClose(fractures,id1,id2)){
                 array<double,4> coeff1 = Piano(id1,fractures);
                 array<double,4> coeff2 = Piano(id2,fractures);
                 Line r = Inter(coeff1,coeff2);
+                for (unsigned int j=0; j<fractures.Vertices[id1].rows(); j++){
+
+                }
 
             }
 
         }
->>>>>>> Stashed changes
+
     }
 
     for (unsigned int id1 = 0; id1<fractures.NumberFractures; id1++) {

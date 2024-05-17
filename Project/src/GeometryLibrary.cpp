@@ -160,21 +160,14 @@ array<double,4> Piano(unsigned int& id, Fractures& FR)
     return coeff;
 }
 
-<<<<<<< Updated upstream
-
-array<double,6> Inter(array<double,4>& coeff1, array<double,4>& coeff2){
-=======
 Line Inter(array<double,4>& coeff1, array<double,4>& coeff2)
 {
     Line line;
->>>>>>> Stashed changes
     Vector3d v1;
     Vector3d v2;
     for(unsigned int i = 0; i < 3; i++)
     {v1[i] = coeff1[i];
         v2[i] = coeff2[i];}
-
-    array<double,6> vect = {0,0,0,0,0,0};
 
     line.direction[0] = v1[1]*v2[2] - v1[2]*v2[1];
     line.direction[1] = v1[2]*v2[0] - v1[0]*v2[2];
@@ -200,18 +193,14 @@ Line Inter(array<double,4>& coeff1, array<double,4>& coeff2)
         line.point[0] = P[0];
         line.point[2] = P[1];
     }
-<<<<<<< Updated upstream
 
     /*else{
      * ...inserire altri casi...
         } */
 
-}
-
-=======
     return line;
 }
->>>>>>> Stashed changes
+
 
 Matrix<double,4,4> PuntiIntersRetta(Fractures& fracture, unsigned int& Id1, unsigned int& Id2, array<double,6>& v){
     double t;
