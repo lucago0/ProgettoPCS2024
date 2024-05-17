@@ -21,7 +21,7 @@ struct Fractures{
 struct Traces{
     unsigned int NumberTraces = 0;
     map<unsigned int, array<unsigned int, 2>> FracturesId;
-    map<unsigned int, Vector3d> Vertices;
+    map<unsigned int, Matrix<double, 3,2>> Vertices;
     map<unsigned int, bool> Tips;
 };
 
