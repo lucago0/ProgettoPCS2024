@@ -42,4 +42,8 @@ array<double,6> Inter(array<double,4>& coeff1, array<double,4>& coeff2);
 Matrix<double,4,4> PuntiIntersRetta(Fractures& fracture, unsigned int& Id1, unsigned int& Id2, array<double,6>& v);
 array<double,4> intersection(const Matrix<double,4,4>&Q);
 
+<<<<<<< Updated upstream
+=======
+double distanceSquared(Fractures& mesh, array<double,3> P1, array<double,3> P2);
+>>>>>>> Stashed changes
 };
