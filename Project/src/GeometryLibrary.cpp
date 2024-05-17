@@ -1,269 +1,84 @@
-#include <GeometryLibrary.hpp>
-#include <fstream>
-#include <sstream>
 #include <iostream>
-#include <array>
-#include <vector>
-#include <cmath>
-#include <algorithm>
-#include <Eigen/Dense>
-#include <map>
+#include <GeometryLibrary.hpp>
+#include <Utils.hpp>
 
 using namespace std;
-using namespace Eigen;
+using namespace FracturesLib;
 
-namespace FracturesLib{
-
-bool importFracture(const string& filename, Fractures& fracture) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        return false;
-    }
-
-    string header;
-    getline(file, header); // Read the header line to discard it
-
-    string line;
-    getline(file,line);
-    fracture.NumberFractures = stoi(line);
-    int numFrac = stoi(line);
-    char pv;
-    int numVertices;
-    unsigned int k;
-
-    while (numFrac--) {
-        getline(file, line);
-        getline(file, line);
-        stringstream ss(line);
-        ss >> k >> pv >> numVertices;
-
-        Matrix<double, 3, Dynamic> actualVert(3, numVertices);
-
-        getline(file, line);
-        string val;
-        // Read Vertices
-        for(int j = 0; j < 3; j++){
-            for(int i = 0; i < numVertices; i++){
-                file >> val;
-                actualVert(j, i) = stod(val);
-            }
-        }
-        file >> pv;
-
-        // Add fracture data to the fractures map
-        fracture.Vertices.insert(make_pair(k, actualVert));
-    }
-    file.close();
-    return true;
-}
-
-double distanceSquared(const Vector3d& A,const Vector3d& B){
-    return pow(A[0]-B[0],2) + pow(A[1]-B[1],2) + pow(A[2]-B[2],2);
-}
-
-void OutputFile(Traces& TR, Fractures& FR)
+int main()
 {
-    string nameFileO = "Traces.txt";
-    ofstream ofs(nameFileO);
-
-    if (ofs.fail())
+    Fractures fractures;
+    string filepath = "./FR3_data.txt";
+    if(!importFracture(filepath, fractures))
     {
-        cout << "Impossibile creare il file di output" << endl;
-        return;
+        return 1;
     }
 
-    ofs << "# Number of Traces" << endl;
-    ofs << TR.NumberTraces << endl;
-    ofs << "# TraceId; FracturesId1; FracturesId2; X1; Y1; Z1; X2; Y2; Z2" << endl;
+    Traces traces;
+    unsigned int numberTraces = 0;
+    for (unsigned int id1 = 0; id1<fractures.NumberFractures; id1++) {
+        for (unsigned int id2 = id1+1; id2<fractures.NumberFractures; id2++) {
+            if (areClose(fractures,id1,id2)){
+                Vector4d coeff1 = Piano(id1,fractures);
+                Vector4d coeff2 = Piano(id2,fractures);
+                // piani non paralleli
+                Line r = Inter(coeff1,coeff2);
+                Line r_j;
+                Matrix<double,4,4> intersectionPoints;
+                unsigned int points = 0;
+                for(unsigned int i = 0; i < 2; i++){
+                    unsigned int currentId = (i==0) ? id1:id2;
+                    for (unsigned int j=0; j<fractures.Vertices[currentId].cols(); j++){
+                        if(j<fractures.Vertices[currentId].cols()-1){
+                            r_j.point = fractures.Vertices[currentId].col(j);
+                            r_j.direction = (fractures.Vertices[currentId].col(j+1)-fractures.Vertices[currentId].col(j));
+                        }
+                        else{
+                            r_j.point = fractures.Vertices[currentId].col(j);
+                            r_j.direction = (fractures.Vertices[currentId].col(0)-fractures.Vertices[currentId].col(j));
+                        }
+                        // mi assicuro che ci sia intersezione tra r ed r_j con cross
+                        VectorXd Q = PuntiIntersRetta(r,r_j); // Q,t,s
+                        if (Q[4]>=0 && Q[4]<=1){ // Q[4] è s!!! e tau?
+                            intersectionPoints.col(points) = Q.head(4);
+                            points++;
+                        }
+                    }
+                }
+                points = 0;
+                Vector4d t = intersection(intersectionPoints);
+                Vector4d t_star = intersectionPoints.row(3);
+                array<unsigned int,2> v = {id1,id2};
+                traces.FracturesId[numberTraces] = v;
+                Matrix<double,3,2> vertices;
+                vertices.col(0) = r.point + t[0]*r.direction;
+                vertices.col(1) = r.point + t[1]*r.direction;
+                traces.Vertices.insert(make_pair(numberTraces, vertices));
+                numberTraces++;
 
-    for(unsigned int i = 0; i < TR.NumberTraces;i++)
-    {
-        ofs << i+1 << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
-        cout << i+1 << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
-    }
-
-    map<unsigned int, unsigned int> FracTrace;
-
-    for(unsigned int i = 0; i < FR.NumberFractures; i++)
-    {
-        for(unsigned int j = 0; j < TR.NumberTraces; j++)
-        {
-            if(i == TR.FracturesId[j][0] || i == TR.FracturesId[j][1])
-            {
-                FracTrace[i] += 1;
+                // Tips
+                double a = min(t_star[0],t_star[1]);
+                double b = max(t_star[0],t_star[1]);
+                double c = min(t_star[2],t_star[3]);
+                double d = max(t_star[2],t_star[3]);
+                if (t[0] == a && t[1] == c){
+                    traces.Tips[numberTraces] = true;
+                }
+                else if (t[0] == a && t[1] == b){
+                    traces.Tips[numberTraces] = false;
+                }
+                else if (t[0] == b && t[1] == d){
+                    traces.Tips[numberTraces] = true;
+                }
+                else{
+                    traces.Tips[numberTraces] = false;
+                }
             }
         }
     }
+    traces.NumberTraces = numberTraces;
 
-    ofs << "# FractureId; NumTraces" << endl;
-    for(unsigned int i = 0; i < FR.NumberFractures; i++)
-    {
-        ofs << i << ";" << FracTrace[i] << endl;
-    }
+    OutputFile(traces,fractures);
 
-    ofs << "# TraceId; Tips; Length" << endl;
-    for(unsigned int i = 0; i < TR.NumberTraces;i++)
-    {
-        ofs << i << ";" << TR.Tips[i] << ";" << sqrt(distanceSquared(TR.Vertices[0].col(0),TR.Vertices[1].col(1))) << endl;
-    }
-
+    return 0;
 }
-
-bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
-    Vector3d C1;
-    const unsigned int n1 = fracture.Vertices[Id1].cols();
-    Vector3d C2;
-    const unsigned int n2 = fracture.Vertices[Id2].cols();
-
-    for(unsigned int i=0; i<3; i++){
-        for (unsigned int j=0; j<n1; j++){
-            C1[i] += fracture.Vertices[Id1](i,j);
-        }
-        C1[i] /= n1;
-        for (unsigned int j=0; j<n2; j++){
-            C2[i] += fracture.Vertices[Id2](i,j);
-        }
-        C2[i] /= n2;
-    }
-
-    VectorXd rays1;
-    for(unsigned int i=0; i<n1; i++){
-        rays1.resize(rays1.size() + 1);
-        Vector3d point = fracture.Vertices[Id1].col(i);
-        rays1(rays1.size() - 1) = distanceSquared(C1,point);
-    }
-    VectorXd rays2;
-    for(unsigned int i=0; i<n2; i++){
-        rays2.resize(rays2.size() + 1);
-        Vector3d point = fracture.Vertices[Id2].col(i);
-        rays2(rays2.size() - 1) = distanceSquared(C2,point);
-    }
-
-    double R1 = *max_element(rays1.begin(), rays1.end());
-    double R2 = *max_element(rays2.begin(), rays2.end());
-
-    return distanceSquared(C1,C2) <= pow(R1+R2,2);
-}
-
-Vector4d Piano(unsigned int& id, Fractures& FR)
-{
-
-    Vector3d v0 = FR.Vertices[id].col(1);
-    Vector3d v1 = FR.Vertices[id].col(2);
-    Vector3d v2 = FR.Vertices[id].col(3);
-
-    Vector4d coeff = {0,0,0,0};
-
-    coeff[0] = (v1[1]-v0[1])*(v2[2]-v0[2]) - (v1[2]-v0[2])*(v2[1]-v0[1]);
-    coeff[1] = -((v1[0]-v0[0])*(v2[2]-v0[2])-(v2[0]-v0[0])*(v1[2]-v0[2]));
-    coeff[2] = (v1[0]-v0[0])*(v1[1]-v0[1])-(v2[0]-v0[0])*(v1[1]-v0[1]);
-    coeff[3] = -coeff[0]*v0[0]-coeff[1]*v0[1]-coeff[2]*v0[2];
-
-    return coeff;
-}
-
-Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
-{
-    Line line;
-    Vector3d v1;
-    Vector3d v2;
-    for(unsigned int i = 0; i < 3; i++){
-        v1[i] = coeff1[i];
-        v2[i] = coeff2[i];
-    }
-
-    line.direction[0] = v1[1]*v2[2] - v1[2]*v2[1];
-    line.direction[1] = v1[2]*v2[0] - v1[0]*v2[2];
-    line.direction[2] = v1[0]*v2[1] - v1[1]*v2[0];
-
-    if(v2[2] != 0 || v1[2] != 0)
-    {
-        Matrix<double,2,2> M;
-        M << v1[0], v1[1],
-            v2[0],v2[1];
-        Vector2d b = {coeff1[3],coeff2[3]};
-        Vector2d P = M.lu().solve(b);
-        line.point[0] = P[0];
-        line.point[1] = P[1];
-    }
-    else if (v2[1] != 0 || v1[1] != 0)
-    {
-        Matrix<double,2,2> M;
-        M << v1[0], v1[2],
-            v2[0],v2[2];
-        Vector2d b = {coeff1[3],coeff2[3]};
-        Vector2d P = M.lu().solve(b);
-        line.point[0] = P[0];
-        line.point[2] = P[1];
-    }
-
-    /*else{
-     * ...inserire altri casi...
-        } */
-
-    return line;
-}
-
-
-VectorXd PuntiIntersRetta(const Line& r,const Line& rj){  //primi 3 punto di inters. poi t e s
-    VectorXd Q;
-    Q.resize(5);
-    double t;
-    double s;
-    Matrix<double,3,2> A;
-    A << r.direction[0], rj.direction[0],
-         r.direction[1], rj.direction[1],
-         r.direction[2], rj.direction[2];
-
-    Vector3d b = {rj.point[0] - r.point[0],
-                  rj.point[1] - r.point[1],
-                  rj.point[2] - r.point[2]};
-
-    FullPivLU<MatrixXd> lu_decomp(A);
-    int rank_A = lu_decomp.rank();
-
-    // Creare la matrice aumentata [A | B]
-    MatrixXd augmented(A.rows(), A.cols() + 1);
-    augmented << A, b;
-
-    // Calcolare il rango della matrice aumentata [A | B] usando la decomposizione LU con pivotaggio completo
-    FullPivLU<MatrixXd> lu_decomp_aug(augmented);
-    int rank_augmented = lu_decomp_aug.rank();
-
-    if(rank_A == rank_augmented){
-        Vector2d r = A.colPivHouseholderQr().solve(b); //non è quadrata la matrice
-        t = r[0];
-        s = r[1];
-        Q << rj.point[0] + rj.direction[0]*s,
-             rj.point[1] + rj.direction[1]*s,
-             rj.point[2] + rj.direction[2]*s,
-             t,
-             s;
-    };
-    return Q;
-}
-
-
-Vector4d intersection(const Matrix<double,4,4>& Q){
-    double a = Q(3,0);
-    double b = Q(3,1);
-    double c = Q(3,2);
-    double d = Q(3,3);
-
-    Vector4d v = {a,b,c,d};
-    // Calcola l'estremo sinistro dell'intersezione
-    double sx = max(a, c);
-    // Calcola l'estremo destro dell'intersezione
-    double dx = min(b, d);
-    // Se gli intervalli non si sovrappongono, l'intersezione sarà vuota
-    if (sx > dx) {
-        sx = dx = numeric_limits<double>::quiet_NaN(); // Non un numero
-    }
-    double other_sx = (a < c) ? a : c; // other_sx è pari ad a se a<c, altrimenti è pari a c
-    double other_dx = (d > b) ? d : b; // other_dx è pari a d se d>b, altrimenti è pari a b
-    Vector4d output = {sx,dx,other_sx,other_dx}; // in ordine restituiamo l'intervallo di intersezione e gli altri due estremi ordinati
-    return output;
-}
-
-
-};
