@@ -1,3 +1,5 @@
+.cpp
+
 #include <GeometryLibrary.hpp>
 #include <fstream>
 #include <sstream>
@@ -9,7 +11,7 @@
 #include <Eigen/Dense>
 #include <map>
 
-using namespace std;
+    using namespace std;
 using namespace Eigen;
 
 namespace FracturesLib{
@@ -143,7 +145,7 @@ bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
     return distanceSquared(C1,C2) <= pow(R1+R2,2);
 }
 
-array<double,4> Piano(unsigned int& id, Fractures& FR)
+Vector4d Piano(unsigned int& id, Fractures& FR)
 {
 
     Vector3d v0 = FR.Vertices[id].col(1);
@@ -160,7 +162,7 @@ array<double,4> Piano(unsigned int& id, Fractures& FR)
     return coeff;
 }
 
-Line Inter(array<double,4>& coeff1, array<double,4>& coeff2)
+Line Inter(Vector4d& coeff1, Vector4d& coeff2)
 {
     Line line;
     Vector3d v1;
@@ -202,62 +204,63 @@ Line Inter(array<double,4>& coeff1, array<double,4>& coeff2)
 }
 
 
-Matrix<double,4,4> PuntiIntersRetta(Fractures& fracture, unsigned int& Id1, unsigned int& Id2, array<double,6>& v){
+VectorXd PuntiIntersRetta(Line& r, Line& rj){  //primi 3 punto di inters. poi t e s
+    VectorXd Q;
+    Q.resize(5);
     double t;
     double s;
     Vector4d Qtemp;
     int counter = 0;
     Matrix<double,4,4> Q; //matrice dei punti di intersezione
 
-    for(unsigned int j = 0; j < 2; j++) {
-        unsigned int currentId = (j == 0) ? Id1 : Id2;
-        Matrix<double,3,2> A;
-        A << v[0], (fracture.Vertices[currentId](0,j+1)-fracture.Vertices[currentId](0,j)),
-             v[1], (fracture.Vertices[currentId](1,j+1)-fracture.Vertices[currentId](1,j)),
-             v[2], (fracture.Vertices[currentId](2,j+1)-fracture.Vertices[currentId](2,j));
+    for(unsigned int i = 0; i < 2; i++) {
+        unsigned int currentId = (i == 0) ? Id1 : Id2;
+        for(unsigned int j = 0; j < fracture.Vertices[currentId].cols()-1; j++){
+            Matrix<double,3,2> A;
+            A << v[0], (fracture.Vertices[currentId](0,j+1)-fracture.Vertices[currentId](0,j)),
+                v[1], (fracture.Vertices[currentId](1,j+1)-fracture.Vertices[currentId](1,j)),
+                v[2], (fracture.Vertices[currentId](2,j+1)-fracture.Vertices[currentId](2,j));
 
-        Vector3d b = {fracture.Vertices[currentId](0,j) - v[3],
-                      fracture.Vertices[currentId](1,j) - v[4],
-                      fracture.Vertices[currentId](2,j) - v[5]};
+            Vector3d b = {fracture.Vertices[currentId](0,j) - v[3],
+                          fracture.Vertices[currentId](1,j) - v[4],
+                          fracture.Vertices[currentId](2,j) - v[5]};
 
-        FullPivLU<MatrixXd> lu_decomp(A);
-        int rank_A = lu_decomp.rank();
+            FullPivLU<MatrixXd> lu_decomp(A);
+            int rank_A = lu_decomp.rank();
 
-        // Creare la matrice aumentata [A | B]
-        MatrixXd augmented(A.rows(), A.cols() + 1);
-        augmented << A, b;
+            // Creare la matrice aumentata [A | B]
+            MatrixXd augmented(A.rows(), A.cols() + 1);
+            augmented << A, b;
 
-        // Calcolare il rango della matrice aumentata [A | B] usando la decomposizione LU con pivotaggio completo
-        FullPivLU<MatrixXd> lu_decomp_aug(augmented);
-        int rank_augmented = lu_decomp_aug.rank();
+            // Calcolare il rango della matrice aumentata [A | B] usando la decomposizione LU con pivotaggio completo
+            FullPivLU<MatrixXd> lu_decomp_aug(augmented);
+            int rank_augmented = lu_decomp_aug.rank();
 
-        if(rank_A == rank_augmented){
-            Vector2d r = A.colPivHouseholderQr().solve(b); //non è quadrata la matrice
-            t = r[0];
-            s = r[1];
-            if(s >= 0 && s <= 1){
-                Qtemp = {
-                fracture.Vertices[currentId](0,j) + A(0,1)*s,
-                fracture.Vertices[currentId](1,j) + A(1,1)*s,
-                fracture.Vertices[currentId](2,j) + A(2,1)*s,
-                t
-                };
-                Q.col(counter) = Qtemp;
-                counter++;
+            if(rank_A == rank_augmented){
+                Vector2d r = A.colPivHouseholderQr().solve(b); //non è quadrata la matrice
+                t = r[0];
+                s = r[1];
+                Q = (fracture.Vertices[currentId](0,j) + A(0,1)*s,
+                     fracture.Vertices[currentId](1,j) + A(1,1)*s,
+                     fracture.Vertices[currentId](2,j) + A(2,1)*s,
+                     s
+                         t);
+
             };
         };
     }
-
-    return Q;
 }
 
-array<double,4> intersection(const Matrix<double,4,4>&Q){
+return Q;
+}
+
+Vector4d intersection(const Matrix<double,4,4>&Q){
     double a = Q(3,0);
     double b = Q(3,1);
     double c = Q(3,2);
     double d = Q(3,3);
 
-    vector<double> v = {a,b,c,d};
+    Vector4d v = {a,b,c,d};
     // Calcola l'estremo sinistro dell'intersezione
     double sx = max(a, c);
     // Calcola l'estremo destro dell'intersezione
@@ -268,7 +271,7 @@ array<double,4> intersection(const Matrix<double,4,4>&Q){
     }
     double other_sx = (a < c) ? a : c; // other_sx è pari ad a se a<c, altrimenti è pari a c
     double other_dx = (d > b) ? d : b; // other_dx è pari a d se d>b, altrimenti è pari a b
-    array<double,4> output = {sx,dx,other_sx,other_dx}; // in ordine restituiamo l'intervallo di intersezione e gli altri due estremi ordinati
+    Vector4d output = {sx,dx,other_sx,other_dx}; // in ordine restituiamo l'intervallo di intersezione e gli altri due estremi ordinati
     return output;
 }
 
