@@ -27,12 +27,18 @@ int main()
                 Matrix<double,4,4> intersectionPoints;
                 unsigned int points = 0;
                 for(unsigned int i = 0; i < 2; i++){
-                    unsigned int currentId = (i == 0) ? id1 : id2;
-                    for (unsigned int j=0; j<fractures.Vertices[currentId].rows()-1; j++){
-                        r_j.point(fractures.Vertices[currentId].col(j));
-                        r_j.direction(fractures.Vertices[currentId].col(j+1)-fractures.Vertices[currentId].col(j));
+                    unsigned int currentId = (i==0) ? id1:id2;
+                    for (unsigned int j=0; j<fractures.Vertices[currentId].cols(); j++){
+                        if(j<fractures.Vertices[currentId].cols()-1){
+                            r_j.point = fractures.Vertices[currentId].col(j);
+                            r_j.direction = (fractures.Vertices[currentId].col(j+1)-fractures.Vertices[currentId].col(j));
+                        }
+                        else{
+                            r_j.point = fractures.Vertices[currentId].col(j);
+                            r_j.direction = (fractures.Vertices[currentId].col(0)-fractures.Vertices[currentId].col(j));
+                        }
                         // mi assicuro che ci sia intersezione tra r ed r_j con cross
-                        Vector4d Q = PuntiIntersRetta(r,r_j); // Q,t,s
+                        VectorXd Q = PuntiIntersRetta(r,r_j); // Q,t,s
                         if (Q[4]>=0 && Q[4]<=1){ // Q[4] è s!!! e tau?
                             intersectionPoints.col(points) = Q.head(4);
                             points++;
@@ -40,21 +46,21 @@ int main()
                     }
                 }
                 points = 0;
-                numberTraces++;
                 Vector4d t = intersection(intersectionPoints);
-                t_star = intersectionPoints.row(3);
+                Vector4d t_star = intersectionPoints.row(3);
                 array<unsigned int,2> v = {id1,id2};
                 traces.FracturesId[numberTraces] = v;
                 Matrix<double,3,2> vertices;
                 vertices.col(0) = r.point + t[0]*r.direction;
                 vertices.col(1) = r.point + t[1]*r.direction;
-                traces.Vertices[numberTraces] = vertices;
+                traces.Vertices.insert(make_pair(numberTraces, vertices));
+                numberTraces++;
 
                 // Tips
-                a = min(t_star[0],t_star[1]);
-                b = max(t_star[0],t_star[1]);
-                c = min(t_star[2],t_star[3]);
-                d = max(t_star[2],t_star[3]);
+                double a = min(t_star[0],t_star[1]);
+                double b = max(t_star[0],t_star[1]);
+                double c = min(t_star[2],t_star[3]);
+                double d = max(t_star[2],t_star[3]);
                 if (t[0] == a && t[1] == c){
                     traces.Tips[numberTraces] = true;
                 }
