@@ -253,9 +253,9 @@ Vector4d intersection(const Matrix<double,4,4>& Q){
     // Calcola l'estremo destro dell'intersezione
     double dx = min(b, d);
     // Se gli intervalli non si sovrappongono, l'intersezione sarà vuota
-    if (sx > dx) {
-        sx = dx = numeric_limits<double>::quiet_NaN(); // Non un numero
-    }
+    // if (sx > dx) {
+    //     sx = dx = numeric_limits<double>::quiet_NaN(); // Non un numero
+    // }
     double other_sx = (a < c) ? a : c; // other_sx è pari ad a se a<c, altrimenti è pari a c
     double other_dx = (d > b) ? d : b; // other_dx è pari a d se d>b, altrimenti è pari a b
     Vector4d output = {sx,dx,other_sx,other_dx}; // in ordine restituiamo l'intervallo di intersezione e gli altri due estremi ordinati
