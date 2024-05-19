@@ -8,7 +8,7 @@ using namespace FracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR3_data.txt";
+    string filepath = "./FR10_data.txt";
     if(!importFracture(filepath, fractures))
     {
         return 1;
@@ -39,13 +39,12 @@ int main()
                         }
                         // mi assicuro che ci sia intersezione tra r ed r_j con cross
                         VectorXd Q = PuntiIntersRetta(r,r_j); // Q,t,s
-                        if (Q[4]>=0 && Q[4]<=1){ // Q[4] è s!!! e tau?
+                        if (Q[4]>= 0 && Q[4]<=1){ // Q[4] è s!!! e tau?
                             intersectionPoints.col(points) = Q.head(4);
                             points++;
                         }
                     }
                 }
-                points = 0;
                 Vector4d t = intersection(intersectionPoints);
                 Vector4d t_star = intersectionPoints.row(3);
                 array<unsigned int,2> v = {id1,id2};
