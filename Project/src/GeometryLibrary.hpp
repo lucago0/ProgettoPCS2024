@@ -33,7 +33,7 @@ struct Line{
 
 bool importFracture(const string& filename, Fractures& fracture);
 double distanceSquared(const Vector3d& A,const Vector3d& B);
-void OutputFile(const Traces& TR, const Fractures& FR);
+void OutputFile(Traces& TR, Fractures& FR);
 bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2);
 Vector4d Piano(unsigned int& id, Fractures& FR);
 Line Inter(const Vector4d &coeff1, const Vector4d &coeff2);
