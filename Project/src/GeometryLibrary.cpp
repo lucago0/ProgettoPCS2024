@@ -104,7 +104,7 @@ void OutputFile(Traces& TR, Fractures& FR)
     ofs << "# TraceId; Tips; Length" << endl;
     for(unsigned int i = 0; i < TR.NumberTraces;i++)
     {
-        ofs << i << ";" << TR.Tips[i] << ";" << sqrt(distanceSquared(TR.Vertices[0].col(0),TR.Vertices[1].col(1))) << endl;
+        ofs << i << ";" << TR.Tips[i] << ";" << sqrt(distanceSquared(TR.Vertices[i].col(0),TR.Vertices[i].col(1))) << endl;
     }
 
 }
@@ -148,16 +148,16 @@ bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
 Vector4d Piano(unsigned int& id, Fractures& FR)
 {
 
-    Vector3d v0 = FR.Vertices[id].col(1);
-    Vector3d v1 = FR.Vertices[id].col(2);
-    Vector3d v2 = FR.Vertices[id].col(3);
+    Vector3d v0 = FR.Vertices[id].col(0);
+    Vector3d v1 = FR.Vertices[id].col(1);
+    Vector3d v2 = FR.Vertices[id].col(2);
 
     Vector4d coeff = {0,0,0,0};
 
     coeff[0] = (v1[1]-v0[1])*(v2[2]-v0[2]) - (v1[2]-v0[2])*(v2[1]-v0[1]);
     coeff[1] = -((v1[0]-v0[0])*(v2[2]-v0[2])-(v2[0]-v0[0])*(v1[2]-v0[2]));
-    coeff[2] = (v1[0]-v0[0])*(v1[1]-v0[1])-(v2[0]-v0[0])*(v1[1]-v0[1]);
-    coeff[3] = coeff[0]*v0[0]-coeff[1]*v0[1]-coeff[2]*v0[2];
+    coeff[2] = (v1[0]-v0[0])*(v2[1]-v0[1])-(v2[0]-v0[0])*(v1[1]-v0[1]);
+    coeff[3] = -(coeff[0]*v0[0]+coeff[1]*v0[1]+coeff[2]*v0[2]); //da capire i segni
 
     return coeff;
 }
@@ -170,16 +170,14 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
     v1 = coeff1.head(3);
     v2 = coeff2.head(3);
 
-    line.direction[0] = v1[1]*v2[2] - v1[2]*v2[1];
-    line.direction[1] = v1[2]*v2[0] - v1[0]*v2[2];
-    line.direction[2] = v1[0]*v2[1] - v1[1]*v2[0];
+    line.direction = v2.cross(v1);
 
     if(v2[2] != 0 || v1[2] != 0)
     {
         Matrix<double,2,2> M;
         M << v1[0], v1[1],
             v2[0],v2[1];
-        Vector2d b = {coeff1[3],coeff2[3]};
+        Vector2d b = {-coeff1[3],-coeff2[3]};
         Vector2d P = M.colPivHouseholderQr().solve(b);
         line.point[0] = P[0];
         line.point[1] = P[1];
@@ -206,7 +204,7 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
 VectorXd PuntiIntersRetta(const Line& r,const Line& rj){  //primi 3 punto di inters. poi t e s
     VectorXd Q;
     Q.resize(5);
-    Q[4] = -1;
+    Q[4] = -2; //così se non c'è soluzione non salvo
     double t;
     double s;
     Matrix<double,3,2> A;
@@ -230,9 +228,9 @@ VectorXd PuntiIntersRetta(const Line& r,const Line& rj){  //primi 3 punto di int
     int rank_augmented = lu_decomp_aug.rank();
 
     if(rank_A == rank_augmented){
-        Vector2d r = A.colPivHouseholderQr().solve(b); //non è quadrata la matrice
-        t = r[0];
-        s = r[1];
+        Vector2d k = A.colPivHouseholderQr().solve(b); //non è quadrata la matrice
+        t = k[0];
+        s = -k[1]; //da capire perchè ci va il -
         Q << rj.point[0] + rj.direction[0]*s,
             rj.point[1] + rj.direction[1]*s,
             rj.point[2] + rj.direction[2]*s,
