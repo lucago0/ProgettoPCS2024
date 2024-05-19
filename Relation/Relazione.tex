@@ -125,7 +125,8 @@ Nel caso in cui troviamo i 4 punti di intersezione, associamo ad ognuno il valor
 \end{enumerate}
 Negli altri casi (come ad esempio $a=t_2$ e $b=t_1$) dobbiamo tener conto che i valori dei parametri associati hanno un ordinamento diverso. Attraverso questo algoritmo abbiamo trovato i vertici delle tracce, il loro valore di \textbf{Tips} e anche le intersezioni dei prolungamenti di esse sui poligoni, il che risulterà molto utile in seguito.
 
-
+\section{Determinazione dei sotto-poligoni generati per ogni frattura}
+Per ogni poligono $j=1,\dots,N$, consideriamo inizialmente tutte le fratture passanti per lo stesso e, attraverso i valori di $t$ trovati nelle sezioni precedenti (ossia i valori scartati dopo l'intersezione dei due intervalli), identifichiamo i vertici dei nuovi sotto-poligoni sempre allo stesso modo, ossia:$$\B{OP}=\B{OQ}+t^*\B{v},$$ dove $t^*$ è il valore del parametro reale corrispondente a un punto che giace su un lato del poligono e sulla retta contenente la traccia. Per ordinare i punti in senso antiorario dobbiamo ricordare che l'intersezione tra la retta $r_j$ e la retta $r$ è avvenuta prendendo i vertici $\B{P}_j$ e $\B{P}_{j+1}$, che sono già ordinati in senso antiorario. Nel momento in cui $r$ ed $r_j$ risultano in un'intersezione per cui effettivamente il punto $\B{Q}$ giace sul lato (e, quindi, il valore associato $s\in[0,1]$), scartiamo tutti i vertici $\B{P}_{j+1},\dots,\B{P}_{j+k}$, dove $\B{P}_{j+k}$ è il vertice del lato $\B{P}_{j+k}\B{P}_{j+k+1}$ per cui avviene che l'altra intersezione con la retta $r$ è ammissibile. Il nuovo sotto-poligono generato avrà gli stessi vertici del poligono originale, esclusi i vertici $\B{P}_{j+1},\dots,\B{P}_{j+k}$, che verranno sostituiti dai due punti della retta contenente la traccia giacenti sui lati del poligono. 
 
 
 \end{document}

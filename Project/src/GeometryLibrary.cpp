@@ -200,7 +200,6 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
     return line;
 }
 
-
 VectorXd PuntiIntersRetta(const Line& r,const Line& rj){  //primi 3 punto di inters. poi t e s
     VectorXd Q;
     Q.resize(5);
@@ -240,14 +239,12 @@ VectorXd PuntiIntersRetta(const Line& r,const Line& rj){  //primi 3 punto di int
     return Q;
 }
 
+Vector4d intersection(const Vector4d& Q){
+    double a = min(Q[0],Q[1]);
+    double b = max(Q[0],Q[1]);
+    double c = min(Q[2],Q[3]);
+    double d = max(Q[2],Q[3]);
 
-Vector4d intersection(const Matrix<double,4,4>& Q){
-    double a = Q(3,0);
-    double b = Q(3,1);
-    double c = Q(3,2);
-    double d = Q(3,3);
-
-    Vector4d v = {a,b,c,d};
     // Calcola l'estremo sinistro dell'intersezione
     double sx = max(a, c);
     // Calcola l'estremo destro dell'intersezione

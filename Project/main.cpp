@@ -45,8 +45,8 @@ int main()
                         }
                     }
                 }
-                Vector4d t = intersection(intersectionPoints);
                 Vector4d t_star = intersectionPoints.row(3);
+                Vector4d t = intersection(t_star);
                 array<unsigned int,2> v = {id1,id2};
                 traces.FracturesId[numberTraces] = v;
                 Matrix<double,3,2> vertices;

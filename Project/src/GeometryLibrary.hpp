@@ -38,6 +38,6 @@ bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2);
 Vector4d Piano(unsigned int& id, Fractures& FR);
 Line Inter(const Vector4d &coeff1, const Vector4d &coeff2);
 VectorXd PuntiIntersRetta(const Line& r,const Line& rj);
-Vector4d intersection(const Matrix<double,4,4>&Q);
+Vector4d intersection(const Vector4d& Q);
 
 };
