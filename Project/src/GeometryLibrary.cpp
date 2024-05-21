@@ -181,6 +181,7 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
         Vector2d P = M.colPivHouseholderQr().solve(b);
         line.point[0] = P[0];
         line.point[1] = P[1];
+        line.point[2] = 0;
     }
     else
     {
@@ -191,11 +192,8 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
         Vector2d P = M.colPivHouseholderQr().solve(b);
         line.point[0] = P[0];
         line.point[2] = P[1];
+        line.point[1] = 0;
     }
-
-    /*else{
-     * ...inserire altri casi...
-        } */
 
     return line;
 }
