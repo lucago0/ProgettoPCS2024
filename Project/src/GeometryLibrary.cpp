@@ -188,7 +188,7 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
         Matrix<double,2,2> M;
         M << v1[0], v1[2],
             v2[0],v2[2];
-        Vector2d b = {coeff1[3],coeff2[3]};
+        Vector2d b = {-coeff1[3],-coeff2[3]};
         Vector2d P = M.colPivHouseholderQr().solve(b);
         line.point[0] = P[0];
         line.point[2] = P[1];
