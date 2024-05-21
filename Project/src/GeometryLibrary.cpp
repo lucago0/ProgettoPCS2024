@@ -57,13 +57,12 @@ bool importFracture(const string& filename, Fractures& fracture) {
     return true;
 }
 
-// Funzione per ordinare i valori in modo crescente
-bool compareByValue(const std::pair<unsigned int, double> &a, const std::pair<unsigned int, double> &b) {
-    return a.second > b.second;
-}
-
 double distanceSquared(const Vector3d& A,const Vector3d& B){
     return pow(A[0]-B[0],2) + pow(A[1]-B[1],2) + pow(A[2]-B[2],2);
+}
+
+bool compareByValue(const pair<unsigned int, double> &a, const pair<unsigned int, double> &b) {
+    return a.second > b.second;
 }
 
 void OutputFile(Traces& TR, Fractures& FR)
@@ -84,7 +83,6 @@ void OutputFile(Traces& TR, Fractures& FR)
     for(unsigned int i = 0; i < TR.NumberTraces;i++)
     {
         ofs << i+1 << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
-        cout << i+1 << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
     }
 
     map<unsigned int, unsigned int> FracTrace;
@@ -107,7 +105,7 @@ void OutputFile(Traces& TR, Fractures& FR)
     }
 
     // Copia gli elementi della mappa in un vettore di coppie
-    vector<pair<unsigned int, double>> mapElements(t.Lengths.begin(), t.Lengths.end());
+    vector<pair<unsigned int, double>> mapElements(TR.Lengths.begin(), TR.Lengths.end());
 
     // Ordina il vettore in base ai valori
     sort(mapElements.begin(), mapElements.end(), compareByValue);
@@ -120,10 +118,11 @@ void OutputFile(Traces& TR, Fractures& FR)
 
 }
 
+
 bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
-    Vector3d C1;
+    Vector3d C1 = {0,0,0};
     const unsigned int n1 = fracture.Vertices[Id1].cols();
-    Vector3d C2;
+    Vector3d C2 = {0,0,0};
     const unsigned int n2 = fracture.Vertices[Id2].cols();
 
     for(unsigned int i=0; i<3; i++){
@@ -141,19 +140,19 @@ bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
     for(unsigned int i=0; i<n1; i++){
         rays1.resize(rays1.size() + 1);
         Vector3d point = fracture.Vertices[Id1].col(i);
-        rays1(rays1.size() - 1) = distanceSquared(C1,point);
+        rays1(rays1.size() - 1) = sqrt(distanceSquared(C1,point));
     }
     VectorXd rays2;
     for(unsigned int i=0; i<n2; i++){
         rays2.resize(rays2.size() + 1);
         Vector3d point = fracture.Vertices[Id2].col(i);
-        rays2(rays2.size() - 1) = distanceSquared(C2,point);
+        rays2(rays2.size() - 1) = sqrt(distanceSquared(C2,point));
     }
 
     double R1 = *max_element(rays1.begin(), rays1.end());
     double R2 = *max_element(rays2.begin(), rays2.end());
 
-    return distanceSquared(C1,C2) <= pow(R1+R2,2);
+    return distanceSquared(C1,C2) <= pow(R1+R2,2); //capire bene
 }
 
 Vector4d Piano(unsigned int& id, Fractures& FR)
@@ -183,7 +182,7 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
 
     line.direction = v2.cross(v1);
 
-    if(line.direction[2] != 0)
+    if(v2[2] != 0 || v1[2] != 0)
     {
         Matrix<double,2,2> M;
         M << v1[0], v1[1],
@@ -192,19 +191,21 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
         Vector2d P = M.colPivHouseholderQr().solve(b);
         line.point[0] = P[0];
         line.point[1] = P[1];
-        line.point[2] = 0;
     }
-    else
+    else if (v2[1] != 0 || v1[1] != 0)
     {
         Matrix<double,2,2> M;
         M << v1[0], v1[2],
             v2[0],v2[2];
-        Vector2d b = {-coeff1[3],-coeff2[3]};
+        Vector2d b = {coeff1[3],coeff2[3]};
         Vector2d P = M.colPivHouseholderQr().solve(b);
         line.point[0] = P[0];
         line.point[2] = P[1];
-        line.point[1] = 0;
     }
+
+    /*else{
+     * ...inserire altri casi...
+        } */
 
     return line;
 }
@@ -266,6 +267,22 @@ Vector4d intersection(const Vector4d& Q){
     double other_dx = (d > b) ? d : b; // other_dx è pari a d se d>b, altrimenti è pari a b
     Vector4d output = {sx,dx,other_sx,other_dx}; // in ordine restituiamo l'intervallo di intersezione e gli altri due estremi ordinati
     return output;
+}
+
+bool almostEqual(double a, double b, double tol) {
+    return fabs(a - b) < tol;
+}
+
+bool arePlanesParallel(double A1, double B1, double C1, double A2, double B2, double C2, double tol) {
+    // Compute the normal vectors of the planes
+    double normal1_length = sqrt(A1 * A1 + B1 * B1 + C1 * C1);
+    double normal2_length = sqrt(A2 * A2 + B2 * B2 + C2 * C2);
+
+    // Check if the normal vectors are parallel (i.e., dot product is 1 or -1)
+    double dot_product = (A1 * A2 + B1 * B2 + C1 * C2) / (normal1_length * normal2_length);
+
+    // Check if the dot product is close to 1 or -1 within tolerance
+    return almostEqual(dot_product, 1.0, tol) || almostEqual(dot_product, -1.0, tol);
 }
 
 
