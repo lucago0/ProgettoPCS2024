@@ -172,7 +172,7 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
 
     line.direction = v2.cross(v1);
 
-    if(v2[2] != 0 || v1[2] != 0)
+    if(line.direction[2] != 0)
     {
         Matrix<double,2,2> M;
         M << v1[0], v1[1],
@@ -182,7 +182,7 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
         line.point[0] = P[0];
         line.point[1] = P[1];
     }
-    else if (v2[1] != 0 || v1[1] != 0)
+    else
     {
         Matrix<double,2,2> M;
         M << v1[0], v1[2],
