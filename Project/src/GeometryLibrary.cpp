@@ -59,7 +59,7 @@ bool importFracture(const string& filename, Fractures& fracture) {
 
 // Funzione per ordinare i valori in modo crescente
 bool compareByValue(const std::pair<unsigned int, double> &a, const std::pair<unsigned int, double> &b) {
-    return a.second < b.second;
+    return a.second > b.second;
 }
 
 double distanceSquared(const Vector3d& A,const Vector3d& B){
