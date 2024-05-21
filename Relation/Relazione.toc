@@ -1,0 +1,6 @@
+\babel@toc {italian}{}\relax 
+\babel@toc {italian}{}\relax 
+\contentsline {section}{\numberline {1}Piano passante per una frattura}{1}{}%
+\contentsline {section}{\numberline {2}Retta di intersezione tra piani}{2}{}%
+\contentsline {section}{\numberline {3}Punti di intersezione}{3}{}%
+\contentsline {section}{\numberline {4}Determinazione dei sotto-poligoni generati per ogni frattura}{4}{}%

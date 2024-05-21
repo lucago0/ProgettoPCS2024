@@ -9,8 +9,7 @@ int main()
 {
     Fractures fractures;
     string filepath = "./FR10_data.txt";
-    if(!importFracture(filepath, fractures))
-    {
+    if(!importFracture(filepath, fractures)){
         return 1;
     }
 
@@ -80,6 +79,10 @@ int main()
         }
     }
     traces.NumberTraces = numberTraces;
+
+    for (unsigned int id = 0; id < traces.NumberTraces; id++){
+        traces.Lengths[id] = sqrt(distanceSquared(traces.Vertices[id].col(0),traces.Vertices[id].col(1)));
+    }
 
     OutputFile(traces,fractures);
 

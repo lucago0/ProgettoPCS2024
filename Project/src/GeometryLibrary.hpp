@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 #include <Eigen/Eigen>
+#include <algorithm>
 #include <map>
 
 
@@ -23,6 +24,7 @@ struct Traces{
     map<unsigned int, array<unsigned int, 2>> FracturesId;
     map<unsigned int, Matrix<double,3,2>> Vertices;
     map<unsigned int, bool> Tips;
+    map<unsigned int, double> Lengths;
 };
 
 struct Line{
@@ -39,5 +41,5 @@ Vector4d Piano(unsigned int& id, Fractures& FR);
 Line Inter(const Vector4d &coeff1, const Vector4d &coeff2);
 VectorXd PuntiIntersRetta(const Line& r,const Line& rj);
 Vector4d intersection(const Vector4d& Q);
+bool compareByValue(const std::pair<unsigned int, double> &a, const std::pair<unsigned int, double> &b);
 
-};

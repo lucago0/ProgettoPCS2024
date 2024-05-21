@@ -11,13 +11,17 @@
 \swapnumbers
 
 \title{Progetto Programmazione e Calcolo Scientifico 2024}
+\author{Luca Agostino, Tommaso Basilio, Andrea Cigno Dzeko}
 
 \begin{document}
 
 \maketitle
 
-\section{Piano passante per un poligono}
-Dati $N$ poligoni con $n_i$ vertici ciascuno, denominiamo con $\B{P}^{(i)}_j$ il vertice $j$ del poligono $i$. I range di valori sono, quindi, $i=0,\dots,N-1$ e $j=0,\dots,n_i-1$. Pertanto, per ogni poligono $i$, abbiamo una $n_i$-upla $(\B{P}^{(i)}_0,\dots,\B{P}^{(i)}_{n_i-1})$. Cerchiamo l'equazione cartesiana del piano $\pi$ contenente il poligono, dando per assunto che effettivamente i vertici forniti appartengono tutti ad uno stesso piano e che, quindi, corrispondano effettivamente a un poligono nello spazio tridimensionale. Per semplicità di notazione omettiamo nelle trattazioni successive l'apice $(i)$, sottointendendo che ci stiamo riferendo al poligono $i$-esimo. Vogliamo arrivare a una scrittura di $\pi$ del tipo $$ax+by+cz=d.$$
+\tableofcontents
+
+
+\section{Piano passante per una frattura}
+Date $N$ fratture con $n_i$ vertici ciascuna, denominiamo con $\B{P}^{(i)}_j$ il vertice $j$ della frattura $i$. I range di valori sono, quindi, $i=0,\dots,N-1$ e $j=0,\dots,n_i-1$. Pertanto, per ogni frattura $i$, abbiamo una $n_i$-upla $(\B{P}^{(i)}_0,\dots,\B{P}^{(i)}_{n_i-1})$. Cerchiamo l'equazione cartesiana del piano $\pi$ contenente la frattura, dando per assunto che effettivamente i vertici forniti appartengono tutti ad uno stesso piano e che, quindi, corrispondano effettivamente a un poligono nello spazio tridimensionale. Per semplicità di notazione omettiamo nelle trattazioni successive l'apice $(i)$, sottointendendo che ci stiamo riferendo alla traccia $i$-esima. Vogliamo arrivare a una scrittura di $\pi$ del tipo $$ax+by+cz=d.$$
 Se denotiamo con ${\B{A}\B{B}}=(x_B-x_A,y_B-y_A,z_B-z_A)$ il vettore congiungente $\B{A}$ a $\B{B}$, un generico punto $\B{P}\in\mathbb{R}^3$ appartiene al piano passante per i punti $\B{P}_0,\B{P}_1,\B{P}_2$ se vale che 
 \begin{equation}\label{eq:piano1}
 (\B{P}_0\B{P}_1\wedge \B{P}_0\B{P}_2)\cdot \B{P}_0\B{P}=0,
@@ -58,7 +62,7 @@ $$
 con $a,b,c$ non tutti nulli, non essendo tutti e tre i punti allineati.
 
 \section{Retta di intersezione tra piani}
-Dati due poligoni diversi $i$ e $j$, grazie a quanto detto sopra, riusciamo a trovare l'equazione cartesiana dei due piani contententi i poligoni. Nel caso in cui i due piani non siano paralleli, ci proponiamo di ricavare l'equazione in forma parametrica della retta $r$ che si genera dall'intersezione dei due piani; siamo, cioè, in cerca di una scrittura del tipo $$\B{OP}=\B{OQ}+t\B{v},$$ con $t$ parametro reale e $\B{v}$ la direzione della retta. Scriviamo in un sistema le equazioni per i due piani in questo modo: 
+Date due fratture diverei $i$ e $j$, grazie a quanto detto sopra, riusciamo a trovare l'equazione cartesiana dei due piani contententi le fratture. Nel caso in cui i due piani non siano paralleli, ci proponiamo di ricavare l'equazione in forma parametrica della retta $r$ che si genera dall'intersezione dei due piani; siamo, cioè, in cerca di una scrittura del tipo $$\B{OP}=\B{OQ}+t\B{v},$$ con $t$ parametro reale e $\B{v}$ la direzione della retta. Scriviamo in un sistema le equazioni per i due piani in questo modo: 
 $$
 \begin{cases}
 a_1x+b_1y+c_1z=d_1\\ 
@@ -94,10 +98,10 @@ Per ogni coppia di vertici consecutivi $\B{P}_j,\B{P}_{j+1}$ scriviamo la retta 
 $$
 \B{OP}=\B{OP}_j+s\B{P}_j\B{P}_{j+1},
 $$
-pertanto solo per valori di $s$ in $(0,1)$ otteniamo un punto del lato del poligono. 
-Consideriamo adesso due poligoni, attraverso i punti $1$ e $2$ troviamo i piani che li contengono e la retta di intersezione (se esiste) tra i due.
+pertanto solo per valori di $s$ in $(0,1)$ otteniamo un punto del lato della frattura. 
+Consideriamo adesso due fratture, attraverso i punti $1$ e $2$ troviamo i piani che li contengono e la retta di intersezione (se esiste) tra le due.
 
-Per ogni coppia di vertici consecutivi del primo poligono intersechiamo la retta $r$ di intersezione e la retta $r_j$:
+Per ogni coppia di vertici consecutivi della prima frattura intersechiamo la retta $r$ di intersezione e la retta $r_j$:
 $$
 \begin{cases}
 \B{OP}=\B{OQ}+t\B{v} \\ 
@@ -112,21 +116,21 @@ v_yt-(y_{j+1}-y_j)s=y_j-\overline{y} \\
 v_zt-(z_{j+1}-z_j)s=z_j-\overline{z} \\
 \end{cases}
 \end{equation}
-Potrebbe succedere che il sistema non ammetta soluzioni, in tal caso le due rette non si intersecano, cioè la traccia non attraversa il lato $\B{P}_j\B{P}_{j+1}$. Altrimenti, in caso di sistema determinato otterremo la coppia $(s,t)$. Se $s\in[0,1]$ otteniamo effettivamente che il punto di intersezione giace sul lato $\B{P}_j\B{P}_{j+1}$ del primo poligono. Iteriamo il processo per tutti gli $n_i$ vertici del poligono e troveremo due punti $\B{Q}_1$ e $\B{Q}_2$, trovati attraverso l'intersezione tra $r$ e due lati distinti del poligono.
+Potrebbe succedere che il sistema non ammetta soluzioni, in tal caso le due rette non si intersecano, cioè la traccia non attraversa il lato $\B{P}_j\B{P}_{j+1}$. Altrimenti, in caso di sistema determinato otterremo la coppia $(s,t)$. Se $s\in[0,1]$ otteniamo effettivamente che il punto di intersezione giace sul lato $\B{P}_j\B{P}_{j+1}$ della prima frattura. Iteriamo il processo per tutti gli $n_i$ vertici della frattura e troveremo due punti $\B{Q}_1$ e $\B{Q}_2$, trovati attraverso l'intersezione tra $r$ e due lati distinti della frattura.
 
-Alla stessa maniera, effettuiamo questi calcoli per il secondo poligono, trovando o intersezione nulla per ogni lato o due altri due punti $\B{Q}_3$ e $\B{Q}_4$.
+Alla stessa maniera, effettuiamo questi calcoli per la seconda frattura, trovando o intersezione nulla per ogni lato o due altri due punti $\B{Q}_3$ e $\B{Q}_4$.
 
 Nel caso in cui troviamo i 4 punti di intersezione, associamo ad ognuno il valore di $t$ corrispondente trovato nel sistema \eqref{sis:parametri} e costruiamo due intervalli dell'asse reale ordinando i valori dei parametri: otteniamo allora $(a,b)$ e $(c,d)$, dove $a,b\in\{t_1,t_2\}$ e $c,d\in\{t_3,t_4\}$. Se poniamo $a=\text{min}\{t_1,t_2\}$, $b=\text{max}\{t_1,t_2\}$, $c=\text{min}\{t_3,t_4\}$ e $d=\text{max}\{t_3,t_4\}$, attraverso una funzione che calcoli l'intersezione tra questi due intervalli, verifichiamo che
 \begin{enumerate} [(i)]
-\item se $(a,b)\cap(c,d)=(a,c)$, allora si tratta di una frattura non passante e i suoi vertici sono $\B{Q}_1$ e $\B{Q}_3$;
-\item se $(a,b)\cap(c,d)=(a,b)$, allora si tratta di una frattura passante per il poligono $1$ e i suoi vertici sono $\B{Q}_1$ e $\B{Q}_2$;
-\item se $(a,b)\cap(c,d)=(b,d)$, allora si tratta di una frattura non passante e i suoi vertici sono $\B{Q}_2$ e $\B{Q}_4$;
-\item se $(a,b)\cap(c,d)=(c,d)$, allora si tratta di una frattura passante per il poligono $2$ e i suoi vertici sono $\B{Q}_3$ e $\B{Q}_4$.
+\item se $(a,b)\cap(c,d)=(a,c)$, allora si tratta di una traccia non passante e i suoi vertici sono $\B{Q}_1$ e $\B{Q}_3$;
+\item se $(a,b)\cap(c,d)=(a,b)$, allora si tratta di una traccia passante per il poligono $1$ e i suoi vertici sono $\B{Q}_1$ e $\B{Q}_2$;
+\item se $(a,b)\cap(c,d)=(b,d)$, allora si tratta di una traccia non passante e i suoi vertici sono $\B{Q}_2$ e $\B{Q}_4$;
+\item se $(a,b)\cap(c,d)=(c,d)$, allora si tratta di una traccia passante per il poligono $2$ e i suoi vertici sono $\B{Q}_3$ e $\B{Q}_4$.
 \end{enumerate}
-Negli altri casi (come ad esempio $a=t_2$ e $b=t_1$) dobbiamo tener conto che i valori dei parametri associati hanno un ordinamento diverso. Attraverso questo algoritmo abbiamo trovato i vertici delle tracce, il loro valore di \textbf{Tips} e anche le intersezioni dei prolungamenti di esse sui poligoni, il che risulterà molto utile in seguito.
+Attraverso questo algoritmo abbiamo trovato i vertici delle tracce, il loro valore di \textbf{Tips} e anche le intersezioni dei prolungamenti di esse sui poligoni, il che risulterà molto utile in seguito.
 
 \section{Determinazione dei sotto-poligoni generati per ogni frattura}
-Per ogni poligono $j=1,\dots,N$, consideriamo inizialmente tutte le fratture passanti per lo stesso e, attraverso i valori di $t$ trovati nelle sezioni precedenti (ossia i valori scartati dopo l'intersezione dei due intervalli), identifichiamo i vertici dei nuovi sotto-poligoni sempre allo stesso modo, ossia:$$\B{OP}=\B{OQ}+t^*\B{v},$$ dove $t^*$ è il valore del parametro reale corrispondente a un punto che giace su un lato del poligono e sulla retta contenente la traccia. Per ordinare i punti in senso antiorario dobbiamo ricordare che l'intersezione tra la retta $r_j$ e la retta $r$ è avvenuta prendendo i vertici $\B{P}_j$ e $\B{P}_{j+1}$, che sono già ordinati in senso antiorario. Nel momento in cui $r$ ed $r_j$ risultano in un'intersezione per cui effettivamente il punto $\B{Q}$ giace sul lato (e, quindi, il valore associato $s\in[0,1]$), scartiamo tutti i vertici $\B{P}_{j+1},\dots,\B{P}_{j+k}$, dove $\B{P}_{j+k}$ è il vertice del lato $\B{P}_{j+k}\B{P}_{j+k+1}$ per cui avviene che l'altra intersezione con la retta $r$ è ammissibile. Il nuovo sotto-poligono generato avrà gli stessi vertici del poligono originale, esclusi i vertici $\B{P}_{j+1},\dots,\B{P}_{j+k}$, che verranno sostituiti dai due punti della retta contenente la traccia giacenti sui lati del poligono. 
+Per ogni frattura $j=1,\dots,N$, consideriamo inizialmente tutte le tracce passanti per lo stesso e, attraverso i valori di $t$ trovati nelle sezioni precedenti (ossia i valori scartati dopo l'intersezione dei due intervalli), identifichiamo i vertici dei nuovi sotto-poligoni sempre allo stesso modo, ossia:$$\B{OP}=\B{OQ}+t^*\B{v},$$ dove $t^*$ è il valore del parametro reale corrispondente a un punto che giace su un lato della frattura e sulla retta contenente la traccia. Per ordinare i punti in senso antiorario dobbiamo ricordare che l'intersezione tra la retta $r_j$ e la retta $r$ è avvenuta prendendo i vertici $\B{P}_j$ e $\B{P}_{j+1}$, che sono già ordinati in senso antiorario. Nel momento in cui $r$ ed $r_j$ risultano in un'intersezione per cui effettivamente il punto $\B{Q}$ giace sul lato (e, quindi, il valore associato $s\in[0,1]$), scartiamo tutti i vertici $\B{P}_{j+1},\dots,\B{P}_{j+k}$, dove $\B{P}_{j+k}$ è il vertice del lato $\B{P}_{j+k}\B{P}_{j+k+1}$ per cui avviene che l'altra intersezione con la retta $r$ è ammissibile. Il nuovo sotto-poligono generato avrà gli stessi vertici della frattura originale, esclusi i vertici $\B{P}_{j+1},\dots,\B{P}_{j+k}$, che verranno sostituiti dai due punti della retta contenente la traccia giacenti sui lati del poligono. 
 
 
 \end{document}

@@ -57,6 +57,11 @@ bool importFracture(const string& filename, Fractures& fracture) {
     return true;
 }
 
+// Funzione per ordinare i valori in modo crescente
+bool compareByValue(const std::pair<unsigned int, double> &a, const std::pair<unsigned int, double> &b) {
+    return a.second < b.second;
+}
+
 double distanceSquared(const Vector3d& A,const Vector3d& B){
     return pow(A[0]-B[0],2) + pow(A[1]-B[1],2) + pow(A[2]-B[2],2);
 }
@@ -101,10 +106,16 @@ void OutputFile(Traces& TR, Fractures& FR)
         ofs << i << ";" << FracTrace[i] << endl;
     }
 
+    // Copia gli elementi della mappa in un vettore di coppie
+    vector<pair<unsigned int, double>> mapElements(t.Lengths.begin(), t.Lengths.end());
+
+    // Ordina il vettore in base ai valori
+    sort(mapElements.begin(), mapElements.end(), compareByValue);
+
     ofs << "# TraceId; Tips; Length" << endl;
-    for(unsigned int i = 0; i < TR.NumberTraces;i++)
+    for(auto& couple : mapElements)
     {
-        ofs << i << ";" << TR.Tips[i] << ";" << sqrt(distanceSquared(TR.Vertices[i].col(0),TR.Vertices[i].col(1))) << endl;
+        ofs << couple.first << ";" << TR.Tips[couple.first] << ";" << couple.second << endl;
     }
 
 }
