@@ -3,7 +3,6 @@
 #include <vector>
 #include <array>
 #include <Eigen/Eigen>
-#include <algorithm>
 #include <map>
 
 
@@ -41,5 +40,8 @@ Vector4d Piano(unsigned int& id, Fractures& FR);
 Line Inter(const Vector4d &coeff1, const Vector4d &coeff2);
 VectorXd PuntiIntersRetta(const Line& r,const Line& rj);
 Vector4d intersection(const Vector4d& Q);
-bool compareByValue(const std::pair<unsigned int, double> &a, const std::pair<unsigned int, double> &b);
+bool almostEqual(double a, double b, double tol);
+bool arePlanesParallel(double A1, double B1, double C1, double A2, double B2, double C2, double tol);
+bool compareByValue(const pair<unsigned int, double> &a, const pair<unsigned int, double> &b);
 
+};
