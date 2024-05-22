@@ -8,7 +8,7 @@ using namespace FracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR3_data.txt";
+    string filepath = "./FR362_data.txt";
     if(!importFracture(filepath, fractures))
     {
         return 1;
@@ -40,42 +40,47 @@ int main()
                                 r_j.direction = (fractures.Vertices[currentId].col(0)-fractures.Vertices[currentId].col(j));
                             }
                             // mi assicuro che ci sia intersezione tra r ed r_j con cross
-                            VectorXd Q = PuntiIntersRetta(r,r_j); // Q,t,s
-                            if (Q[4]>= 0 && Q[4]<=1){ // Q[4] è s!!! e tau?
-                                intersectionPoints.col(points) = Q.head(4);
-                                points++;
-                                flag = true;
-                            }
+                            Vector3d test = (r.direction).cross(r_j.direction);
+                            if(!almostEqual(test[0],0,pow(10,-10)) || !almostEqual(test[1],0,pow(10,-10)) || !almostEqual(test[2],0,pow(10,-10))){
+                                VectorXd Q = PuntiIntersRetta(r,r_j); // Q,t,s
+                                if (Q[4]>= 0 && Q[4]<=1){ // Q[4] è s!!! e tau?
+                                    intersectionPoints.col(points) = Q.head(4);
+                                    points++;
+                                    flag = true;
+                                };
+                            };
                         }
                     }
-                    if(flag){
+                    if(flag && points == 4){
                         Vector4d t_star = intersectionPoints.row(3);
                         Vector4d t = intersection(t_star);
-                        array<unsigned int,2> v = {id1,id2};
-                        traces.FracturesId[numberTraces] = v;
-                        Matrix<double,3,2> vertices;
-                        vertices.col(0) = r.point + t[0]*r.direction;
-                        vertices.col(1) = r.point + t[1]*r.direction;
-                        traces.Vertices.insert(make_pair(numberTraces, vertices));
-                        numberTraces++;
+                        if(!isnan(t[0])){
+                            array<unsigned int,2> v = {id1,id2};
+                            traces.FracturesId[numberTraces] = v;
+                            Matrix<double,3,2> vertices;
+                            vertices.col(0) = r.point + t[0]*r.direction;
+                            vertices.col(1) = r.point + t[1]*r.direction;
+                            traces.Vertices.insert(make_pair(numberTraces, vertices));
+                            numberTraces++;
 
-                        // Tips
-                        double a = min(t_star[0],t_star[1]);
-                        double b = max(t_star[0],t_star[1]);
-                        double c = min(t_star[2],t_star[3]);
-                        double d = max(t_star[2],t_star[3]);
-                        if (t[0] == a && t[1] == c){
-                            traces.Tips[numberTraces] = true;
-                        }
-                        else if (t[0] == a && t[1] == b){
-                            traces.Tips[numberTraces] = false;
-                        }
-                        else if (t[0] == b && t[1] == d){
-                            traces.Tips[numberTraces] = true;
-                        }
-                        else{
-                            traces.Tips[numberTraces] = false;
-                        }
+                            // Tips
+                            double a = min(t_star[0],t_star[1]);
+                            double b = max(t_star[0],t_star[1]);
+                            double c = min(t_star[2],t_star[3]);
+                            double d = max(t_star[2],t_star[3]);
+                            if (t[0] == a && t[1] == c){
+                                traces.Tips[numberTraces] = true;
+                            }
+                            else if (t[0] == a && t[1] == b){
+                                traces.Tips[numberTraces] = false;
+                            }
+                            else if (t[0] == b && t[1] == d){
+                                traces.Tips[numberTraces] = true;
+                            }
+                            else{
+                                traces.Tips[numberTraces] = false;
+                            }
+                        };
                     };
                 }
             }
