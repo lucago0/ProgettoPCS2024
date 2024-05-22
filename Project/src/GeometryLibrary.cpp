@@ -82,7 +82,7 @@ void OutputFile(Traces& TR, Fractures& FR)
 
     for(unsigned int i = 0; i < TR.NumberTraces;i++)
     {
-        ofs << i+1 << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
+        ofs << i << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
     }
 
     map<unsigned int, unsigned int> FracTrace;
@@ -140,19 +140,19 @@ bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
     for(unsigned int i=0; i<n1; i++){
         rays1.resize(rays1.size() + 1);
         Vector3d point = fracture.Vertices[Id1].col(i);
-        rays1(rays1.size() - 1) = sqrt(distanceSquared(C1,point));
+        rays1(rays1.size() - 1) = distanceSquared(C1,point);
     }
     VectorXd rays2;
     for(unsigned int i=0; i<n2; i++){
         rays2.resize(rays2.size() + 1);
         Vector3d point = fracture.Vertices[Id2].col(i);
-        rays2(rays2.size() - 1) = sqrt(distanceSquared(C2,point));
+        rays2(rays2.size() - 1) = distanceSquared(C2,point);
     }
 
     double R1 = *max_element(rays1.begin(), rays1.end());
     double R2 = *max_element(rays2.begin(), rays2.end());
 
-    return distanceSquared(C1,C2) <= pow(R1+R2,2); //capire bene
+    return distanceSquared(C1,C2) <= (R1+R2+(2*sqrt(R1)*sqrt(R2))); //capire bene
 }
 
 Vector4d Piano(unsigned int& id, Fractures& FR)
@@ -182,7 +182,7 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
 
     line.direction = v2.cross(v1);
 
-    if(v2[2] != 0 || v1[2] != 0)
+    if(line.direction[2] != 0)
     {
         Matrix<double,2,2> M;
         M << v1[0], v1[1],
@@ -192,12 +192,12 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
         line.point[0] = P[0];
         line.point[1] = P[1];
     }
-    else if (v2[1] != 0 || v1[1] != 0)
+    else
     {
         Matrix<double,2,2> M;
         M << v1[0], v1[2],
             v2[0],v2[2];
-        Vector2d b = {coeff1[3],coeff2[3]};
+        Vector2d b = {-coeff1[3],-coeff2[3]};
         Vector2d P = M.colPivHouseholderQr().solve(b);
         line.point[0] = P[0];
         line.point[2] = P[1];
@@ -225,27 +225,27 @@ VectorXd PuntiIntersRetta(const Line& r,const Line& rj){  //primi 3 punto di int
                   rj.point[1] - r.point[1],
                   rj.point[2] - r.point[2]};
 
-    FullPivLU<MatrixXd> lu_decomp(A);
-    int rank_A = lu_decomp.rank();
+    // FullPivLU<MatrixXd> lu_decomp(A);
+    // int rank_A = lu_decomp.rank();
 
-    // Creare la matrice aumentata [A | B]
-    MatrixXd augmented(A.rows(), A.cols() + 1);
-    augmented << A, b;
+    // // Creare la matrice aumentata [A | B]
+    // MatrixXd augmented(A.rows(), A.cols() + 1);
+    // augmented << A, b;
 
-    // Calcolare il rango della matrice aumentata [A | B] usando la decomposizione LU con pivotaggio completo
-    FullPivLU<MatrixXd> lu_decomp_aug(augmented);
-    int rank_augmented = lu_decomp_aug.rank();
+    // // Calcolare il rango della matrice aumentata [A | B] usando la decomposizione LU con pivotaggio completo
+    // FullPivLU<MatrixXd> lu_decomp_aug(augmented);
+    // int rank_augmented = lu_decomp_aug.rank();
 
-    if(rank_A == rank_augmented){
-        Vector2d k = A.colPivHouseholderQr().solve(b); //non è quadrata la matrice
-        t = k[0];
-        s = -k[1]; //da capire perchè ci va il -
-        Q << rj.point[0] + rj.direction[0]*s,
-            rj.point[1] + rj.direction[1]*s,
-            rj.point[2] + rj.direction[2]*s,
-            t,
-            s;
-    };
+    //if(rank_A == rank_augmented){
+    Vector2d k = A.colPivHouseholderQr().solve(b); //non è quadrata la matrice
+    t = k[0];
+    s = -k[1]; //da capire perchè ci va il -
+    Q << rj.point[0] + rj.direction[0]*s,
+        rj.point[1] + rj.direction[1]*s,
+        rj.point[2] + rj.direction[2]*s,
+        t,
+        s;
+    //};
     return Q;
 }
 
@@ -259,10 +259,10 @@ Vector4d intersection(const Vector4d& Q){
     double sx = max(a, c);
     // Calcola l'estremo destro dell'intersezione
     double dx = min(b, d);
-    // Se gli intervalli non si sovrappongono, l'intersezione sarà vuota
-    // if (sx > dx) {
-    //     sx = dx = numeric_limits<double>::quiet_NaN(); // Non un numero
-    // }
+    //Se gli intervalli non si sovrappongono, l'intersezione sarà vuota
+    if (sx > dx) {
+        sx = dx = numeric_limits<double>::quiet_NaN(); // Non un numero
+    }
     double other_sx = (a < c) ? a : c; // other_sx è pari ad a se a<c, altrimenti è pari a c
     double other_dx = (d > b) ? d : b; // other_dx è pari a d se d>b, altrimenti è pari a b
     Vector4d output = {sx,dx,other_sx,other_dx}; // in ordine restituiamo l'intervallo di intersezione e gli altri due estremi ordinati
