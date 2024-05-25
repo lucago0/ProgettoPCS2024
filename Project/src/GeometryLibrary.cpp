@@ -67,8 +67,10 @@ bool compareByValue(const pair<unsigned int, double> &a, const pair<unsigned int
 
 void OutputFile(Traces& TR, Fractures& FR)
 {
-    string nameFileO = "Traces.txt";
-    ofstream ofs(nameFileO);
+    string Tracce = "Traces.txt";
+    string FrattTracc = "Fratture-Tracce.txt";
+    ofstream ofs(Tracce);
+    ofstream ofs2(FrattTracc);
 
     if (ofs.fail())
     {
@@ -85,6 +87,8 @@ void OutputFile(Traces& TR, Fractures& FR)
         ofs << i << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
     }
 
+
+
     map<unsigned int, unsigned int> FracTrace;
 
     for(unsigned int i = 0; i < FR.NumberFractures; i++)
@@ -98,26 +102,27 @@ void OutputFile(Traces& TR, Fractures& FR)
         }
     }
 
-    ofs << "# FractureId; NumTraces" << endl;
-    for(unsigned int i = 0; i < FR.NumberFractures; i++)
-    {
-        ofs << i << ";" << FracTrace[i] << endl;
-    }
-
     // Copia gli elementi della mappa in un vettore di coppie
     vector<pair<unsigned int, double>> mapElements(TR.Lengths.begin(), TR.Lengths.end());
 
     // Ordina il vettore in base ai valori
     sort(mapElements.begin(), mapElements.end(), compareByValue);
 
-    ofs << "# TraceId; Tips; Length" << endl;
-    for(auto& couple : mapElements)
+    for(unsigned int i = 0; i < FR.NumberFractures; i++)
     {
-        ofs << couple.first << ";" << TR.Tips[couple.first] << ";" << couple.second << endl;
+        ofs2 << "# FractureId; NumTraces" << endl;
+        ofs2 << i << ";" << FracTrace[i] << endl;
+        ofs2 << "# TraceId; Tips; Length" << endl;
+        for(auto& couple : mapElements){
+            if(TR.FracturesId[couple.first][0] == i){
+                ofs2 << couple.first << ";" << TR.Tips[couple.first][0] << ";" << couple.second << endl;
+            }
+            else if(TR.FracturesId[couple.first][1] == i){
+                ofs2 << couple.first << ";" << TR.Tips[couple.first][1] << ";" << couple.second << endl;
+            }
+        }
     }
-
 }
-
 
 bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
     Vector3d C1 = {0,0,0};
