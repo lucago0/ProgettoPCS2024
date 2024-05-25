@@ -8,7 +8,7 @@ using namespace FracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR362_data.txt";
+    string filepath = "./FR10_data.txt";
     if(!importFracture(filepath, fractures))
     {
         return 1;
@@ -23,7 +23,7 @@ int main()
                 flag = false;
                 Vector4d coeff1 = Piano(id1,fractures);
                 Vector4d coeff2 = Piano(id2,fractures);
-                if(!arePlanesParallel(coeff1[0],coeff1[1],coeff1[2],coeff2[0],coeff2[1],coeff2[2],pow(10,-10))){
+                if(!arePlanesParallel(coeff1[0],coeff1[1],coeff1[2],coeff2[0],coeff2[1],coeff2[2],pow(10,-10))){ //SISTEMARE QUI
                     Line r = Inter(coeff1,coeff2);
                     Line r_j;
                     Matrix<double,4,4> intersectionPoints;
@@ -61,7 +61,6 @@ int main()
                             vertices.col(0) = r.point + t[0]*r.direction;
                             vertices.col(1) = r.point + t[1]*r.direction;
                             traces.Vertices.insert(make_pair(numberTraces, vertices));
-                            numberTraces++;
 
                             // Tips
                             double a = min(t_star[0],t_star[1]);
@@ -69,17 +68,30 @@ int main()
                             double c = min(t_star[2],t_star[3]);
                             double d = max(t_star[2],t_star[3]);
                             if (t[0] == a && t[1] == c){
-                                traces.Tips[numberTraces] = true;
+                                traces.Tips[numberTraces][0] = true;
+                                traces.Tips[numberTraces][1] = true;
                             }
                             else if (t[0] == a && t[1] == b){
-                                traces.Tips[numberTraces] = false;
+                                traces.Tips[numberTraces][0] = false;
+                                traces.Tips[numberTraces][1] = true;
+                            }
+                            else if (t[0] == a && t[1] == d){
+                                traces.Tips[numberTraces][0] = true;
+                                traces.Tips[numberTraces][1] = true;
+                            }
+                            else if (t[0] == c && t[1] == b){
+                                traces.Tips[numberTraces][0] = true;
+                                traces.Tips[numberTraces][1] = true;
                             }
                             else if (t[0] == b && t[1] == d){
-                                traces.Tips[numberTraces] = true;
+                                traces.Tips[numberTraces][0] = true;
+                                traces.Tips[numberTraces][1] = true;
                             }
                             else{
-                                traces.Tips[numberTraces] = false;
+                                traces.Tips[numberTraces][0] = true;
+                                traces.Tips[numberTraces][1] = false;
                             }
+                            numberTraces++;
                         };
                     };
                 }
