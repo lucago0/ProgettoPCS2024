@@ -61,6 +61,7 @@ int main()
                             Matrix<double,3,2> vertices;
                             vertices.col(0) = r.point + t[0]*r.direction;
                             vertices.col(1) = r.point + t[1]*r.direction;
+                            traces.Lengths[numberTraces] = sqrt(distanceSquared(vertices.col(0),vertices.col(1)));
                             traces.Vertices.insert(make_pair(numberTraces, vertices));
 
                             // Tips
