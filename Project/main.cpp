@@ -93,8 +93,25 @@ int main()
     }
     traces.NumberTraces = numberTraces;
 
-    for (unsigned int id = 0; id < traces.NumberTraces; id++){
-        traces.Lengths[id] = sqrt(distanceSquared(traces.Vertices[id].col(0),traces.Vertices[id].col(1)));
+    // Copia gli elementi della mappa in un vettore di coppie
+    vector<pair<unsigned int, double>> mapElements(traces.Lengths.begin(), traces.Lengths.end());
+
+    // Ordina il vettore in base ai valori
+    sort(mapElements.begin(), mapElements.end(), compareByValue);
+
+    for(unsigned int i = 0; i < fractures.NumberFractures; i++)
+    {
+        for(auto& couple : mapElements){
+            if(traces.FracturesId[couple.first][0] == i){
+                fractures.tracce[i].push_back(make_tuple(couple.first, traces.Tips[couple.first][0], couple.second));
+            }
+            else if(traces.FracturesId[couple.first][1] == i){
+                fractures.tracce[i].push_back(make_tuple(couple.first, traces.Tips[couple.first][1], couple.second));
+            }
+        }
+        for (auto& pair : fractures.tracce) {
+            sort(pair.second.begin(), pair.second.end(), compareTuple);
+        }
     }
 
     OutputFile(traces,fractures);

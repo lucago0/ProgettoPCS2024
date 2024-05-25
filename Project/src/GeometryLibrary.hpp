@@ -17,6 +17,7 @@ struct Fractures{
     double tol = numeric_limits<double>::epsilon(); // precisione
     double tol_aree = tol*tol/2;
     VectorXi NumTracce;
+    map<unsigned int, vector<tuple<unsigned int, bool, double>>> tracce;
 };
 
 struct Traces{
@@ -44,5 +45,6 @@ Vector4d intersection(const Vector4d& Q);
 bool almostEqual(double a, double b, double tol);
 bool arePlanesParallel(double A1, double B1, double C1, double A2, double B2, double C2, double tol);
 bool compareByValue(const pair<unsigned int, double> &a, const pair<unsigned int, double> &b);
+bool compareTuple(const tuple<unsigned int, bool, double>& a, const tuple<unsigned int, bool, double>& b);
 
 };

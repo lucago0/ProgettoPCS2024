@@ -87,26 +87,17 @@ void OutputFile(Traces& TR, Fractures& FR)
         ofs << i << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
     }
 
-    // Copia gli elementi della mappa in un vettore di coppie
-    vector<pair<unsigned int, double>> mapElements(TR.Lengths.begin(), TR.Lengths.end());
-
-    // Ordina il vettore in base ai valori
-    sort(mapElements.begin(), mapElements.end(), compareByValue);
-
     for(unsigned int i = 0; i < FR.NumberFractures; i++)
     {
         ofs2 << "# FractureId; NumTraces" << endl;
         ofs2 << i << ";" << FR.NumTracce[i] << endl;
         ofs2 << "# TraceId; Tips; Length" << endl;
-        for(auto& couple : mapElements){
-            if(TR.FracturesId[couple.first][0] == i){
-                ofs2 << couple.first << ";" << TR.Tips[couple.first][0] << ";" << couple.second << endl;
-            }
-            else if(TR.FracturesId[couple.first][1] == i){
-                ofs2 << couple.first << ";" << TR.Tips[couple.first][1] << ";" << couple.second << endl;
-            }
+        for (const auto& elem : FR.tracce[i]) {
+            ofs2 << get<0>(elem) << ";" << get<1>(elem) << ";" << get<2>(elem) << endl;
         }
     }
+
+
 }
 
 bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
@@ -275,5 +266,8 @@ bool arePlanesParallel(double A1, double B1, double C1, double A2, double B2, do
     return almostEqual(dot_product, 1.0, tol) || almostEqual(dot_product, -1.0, tol);
 }
 
+bool compareTuple(const tuple<unsigned int, bool, double>& a, const tuple<unsigned int, bool, double>& b) {
+    return get<1>(a) < get<1>(b); // Ordina in base al valore booleano all'interno delle tuple
+}
 
 };
