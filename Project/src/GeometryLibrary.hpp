@@ -22,7 +22,7 @@ struct Traces{
     unsigned int NumberTraces = 0;
     map<unsigned int, array<unsigned int, 2>> FracturesId;
     map<unsigned int, Matrix<double,3,2>> Vertices;
-    map<unsigned int, bool> Tips;
+    map<unsigned int, array<bool,2>> Tips;
     map<unsigned int, double> Lengths;
 };
 
