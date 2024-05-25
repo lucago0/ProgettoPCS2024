@@ -14,6 +14,7 @@ int main()
         return 1;
     }
 
+    fractures.NumTracce.resize(fractures.NumberFractures);
     Traces traces;
     unsigned int numberTraces = 0;
     bool flag;
@@ -80,6 +81,9 @@ int main()
                                 traces.Tips[numberTraces][1] = true;
                             }
                             numberTraces++;
+                            fractures.NumTracce[id1]++;
+                            fractures.NumTracce[id2]++;
+
                         };
                     };
                 }

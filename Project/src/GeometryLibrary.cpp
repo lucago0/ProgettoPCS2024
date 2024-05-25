@@ -87,21 +87,6 @@ void OutputFile(Traces& TR, Fractures& FR)
         ofs << i << ";" << TR.FracturesId[i][0] << ";" << TR.FracturesId[i][1] << ";" << TR.Vertices[i](0,0) << ";" << TR.Vertices[i](1,0) << ";" << TR.Vertices[i](2,0) << ";" << TR.Vertices[i](0,1) << ";" << TR.Vertices[i](1,1) << ";" << TR.Vertices[i](2,1) << endl;
     }
 
-
-
-    map<unsigned int, unsigned int> FracTrace;
-
-    for(unsigned int i = 0; i < FR.NumberFractures; i++)
-    {
-        for(unsigned int j = 0; j < TR.NumberTraces; j++)
-        {
-            if(i == TR.FracturesId[j][0] || i == TR.FracturesId[j][1])
-            {
-                FracTrace[i] += 1;
-            }
-        }
-    }
-
     // Copia gli elementi della mappa in un vettore di coppie
     vector<pair<unsigned int, double>> mapElements(TR.Lengths.begin(), TR.Lengths.end());
 
@@ -111,7 +96,7 @@ void OutputFile(Traces& TR, Fractures& FR)
     for(unsigned int i = 0; i < FR.NumberFractures; i++)
     {
         ofs2 << "# FractureId; NumTraces" << endl;
-        ofs2 << i << ";" << FracTrace[i] << endl;
+        ofs2 << i << ";" << FR.NumTracce[i] << endl;
         ofs2 << "# TraceId; Tips; Length" << endl;
         for(auto& couple : mapElements){
             if(TR.FracturesId[couple.first][0] == i){

@@ -16,6 +16,7 @@ struct Fractures{
     map<unsigned int, Matrix<double, 3, Dynamic>> Vertices;
     double tol = numeric_limits<double>::epsilon(); // precisione
     double tol_aree = tol*tol/2;
+    VectorXi NumTracce;
 };
 
 struct Traces{
