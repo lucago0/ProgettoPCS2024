@@ -67,29 +67,17 @@ int main()
                             double b = max(t_star[0],t_star[1]);
                             double c = min(t_star[2],t_star[3]);
                             double d = max(t_star[2],t_star[3]);
-                            if (t[0] == a && t[1] == c){
-                                traces.Tips[numberTraces][0] = true;
-                                traces.Tips[numberTraces][1] = true;
-                            }
-                            else if (t[0] == a && t[1] == b){
+                            if (t[0] == a && t[1] == b){
                                 traces.Tips[numberTraces][0] = false;
                                 traces.Tips[numberTraces][1] = true;
                             }
-                            else if (t[0] == a && t[1] == d){
+                            else if (t[0] == c && t[1] == d){
                                 traces.Tips[numberTraces][0] = true;
-                                traces.Tips[numberTraces][1] = true;
-                            }
-                            else if (t[0] == c && t[1] == b){
-                                traces.Tips[numberTraces][0] = true;
-                                traces.Tips[numberTraces][1] = true;
-                            }
-                            else if (t[0] == b && t[1] == d){
-                                traces.Tips[numberTraces][0] = true;
-                                traces.Tips[numberTraces][1] = true;
+                                traces.Tips[numberTraces][1] = false;
                             }
                             else{
                                 traces.Tips[numberTraces][0] = true;
-                                traces.Tips[numberTraces][1] = false;
+                                traces.Tips[numberTraces][1] = true;
                             }
                             numberTraces++;
                         };
