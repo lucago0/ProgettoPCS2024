@@ -99,8 +99,10 @@ int main()
     // Ordina il vettore in base ai valori
     sort(mapElements.begin(), mapElements.end(), compareByValue);
 
+
     for(unsigned int i = 0; i < fractures.NumberFractures; i++)
     {
+
         for(auto& couple : mapElements){
             if(traces.FracturesId[couple.first][0] == i){
                 fractures.tracce[i].push_back(make_tuple(couple.first, traces.Tips[couple.first][0], couple.second));
@@ -109,9 +111,9 @@ int main()
                 fractures.tracce[i].push_back(make_tuple(couple.first, traces.Tips[couple.first][1], couple.second));
             }
         }
-        for (auto& pair : fractures.tracce) {
-            sort(pair.second.begin(), pair.second.end(), compareTuple);
-        }
+        stable_sort(fractures.tracce[i].begin(), fractures.tracce[i].end(), [](const auto& a, const auto& b) {
+            return get<1>(a) < get<1>(b);
+        });
     }
 
     OutputFile(traces,fractures);
