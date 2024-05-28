@@ -2,7 +2,7 @@
 #include <GeometryLibrary.hpp>
 #include <Utils.hpp>
 
-using namespace std;
+    using namespace std;
 using namespace FracturesLib;
 
 int main()
@@ -14,16 +14,24 @@ int main()
         return 1;
     }
 
+    double tol = max(pow(10,-12), numeric_limits<double>::epsilon());
+
     fractures.NumTracce.resize(fractures.NumberFractures);
+    fractures.CoeffPiano.resize(fractures.NumberFractures);
+    fractures.CoeffPiano.assign(fractures.NumberFractures, Vector4d::Zero());
     Traces traces;
     unsigned int numberTraces = 0;
     for (unsigned int id1 = 0; id1<fractures.NumberFractures; id1++) {
         for (unsigned int id2 = id1+1; id2<fractures.NumberFractures; id2++) {
-            if (areClose(fractures,id1,id2)){
-                Vector4d coeff1 = Piano(id1,fractures);
-                Vector4d coeff2 = Piano(id2,fractures);
-                if(!arePlanesParallel(coeff1,coeff2,pow(10,-10))){
-                    Line r = Inter(coeff1,coeff2);
+            if (areClose(fractures,id1,id2,tol)){
+                if(fractures.CoeffPiano[id1].isZero()){
+                    fractures.CoeffPiano[id1] = Piano(id1,fractures);
+                }
+                if(fractures.CoeffPiano[id2].isZero()){
+                    fractures.CoeffPiano[id2] = Piano(id2,fractures);
+                }
+                if(!arePlanesParallel(fractures.CoeffPiano[id1],fractures.CoeffPiano[id2],tol)){
+                    Line r = Inter(fractures.CoeffPiano[id1],fractures.CoeffPiano[id2],tol);
                     Line r_j;
                     Matrix<double,4,4> intersectionPoints;
                     unsigned int points = 0;
@@ -35,9 +43,9 @@ int main()
                             r_j.direction = fractures.Vertices[currentId].col((j+1)%n)-fractures.Vertices[currentId].col(j);
                             // mi assicuro che ci sia intersezione tra r ed r_j con cross
                             Vector3d test = (r.direction).cross(r_j.direction);
-                            if(!almostEqual(test[0],0,pow(10,-10)) || !almostEqual(test[1],0,pow(10,-10)) || !almostEqual(test[2],0,pow(10,-10))){
+                            if(!almostEqual(test[0],0,tol) || !almostEqual(test[1],0,tol) || !almostEqual(test[2],0,tol)){
                                 VectorXd Q = PuntiIntersRetta(r,r_j); // Q,t,s
-                                if (Q[4]>= 0 && Q[4]<=1){ // Q[4] è s!!! e tau?
+                                if ((Q[4]>= (0-tol)) && (Q[4]<=(1+tol))){ // Q[4] è s
                                     intersectionPoints.col(points) = Q.head(4);
                                     points++;
                                 };
@@ -46,7 +54,7 @@ int main()
                     }
                     if(points == 4){
                         Vector4d t_star = intersectionPoints.row(3);
-                        Vector4d t = intersection(t_star);
+                        Vector4d t = intersection(t_star,tol);
                         if(!isnan(t[0])){
                             array<unsigned int,4> v = {id1,id2,0,0};
                             traces.FracturesId.push_back(v);
@@ -129,8 +137,6 @@ int main()
         }
     }
     */
-
-
 
     return 0;
 }

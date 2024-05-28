@@ -61,7 +61,7 @@ double distanceSquared(const Vector3d& A,const Vector3d& B){
     return pow(A[0]-B[0],2) + pow(A[1]-B[1],2) + pow(A[2]-B[2],2);
 }
 
-bool compareByValue(const pair<unsigned int, double> &a, const pair<unsigned int, double> &b) {
+bool compareByValue(const pair<unsigned int, double> &a, const pair<unsigned int, const double> &b) {
     return a.second > b.second;
 }
 
@@ -100,7 +100,7 @@ void OutputFile(Traces& TR, Fractures& FR)
 
 }
 
-bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
+bool areClose(Fractures& fracture,const unsigned int& Id1,const unsigned int& Id2, const double& tol){
     Vector3d C1 = {0,0,0};
     const unsigned int n1 = fracture.Vertices[Id1].cols();
     Vector3d C2 = {0,0,0};
@@ -133,10 +133,10 @@ bool areClose(Fractures& fracture, unsigned int& Id1, unsigned int& Id2){
     double R1 = *max_element(rays1.begin(), rays1.end());
     double R2 = *max_element(rays2.begin(), rays2.end());
 
-    return distanceSquared(C1,C2) <= (R1+R2+(2*sqrt(R1)*sqrt(R2))); //capire bene
+    return distanceSquared(C1,C2) <= ((R1+R2+(2*sqrt(R1)*sqrt(R2)))+tol); //capire bene
 }
 
-Vector4d Piano(unsigned int& id, Fractures& FR)
+Vector4d Piano(const unsigned int& id, Fractures& FR)
 {
 
     Vector3d v0 = FR.Vertices[id].col(0);
@@ -153,7 +153,7 @@ Vector4d Piano(unsigned int& id, Fractures& FR)
     return coeff;
 }
 
-Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
+Line Inter(const Vector4d& coeff1, const Vector4d& coeff2,const double& tol)
 {
     Line line;
     Vector3d v1;
@@ -163,7 +163,7 @@ Line Inter(const Vector4d& coeff1, const Vector4d& coeff2)
 
     line.direction = v2.cross(v1);
 
-    if(line.direction[2] != 0)
+    if(!almostEqual(line.direction[2],0,tol))
     {
         Matrix<double,2,2> M;
         M << v1[0], v1[1],
@@ -230,7 +230,7 @@ VectorXd PuntiIntersRetta(const Line& r,const Line& rj){  //primi 3 punto di int
     return Q;
 }
 
-Vector4d intersection(const Vector4d& Q){
+Vector4d intersection(const Vector4d& Q,const double& tol){
     double a = min(Q[0],Q[1]);
     double b = max(Q[0],Q[1]);
     double c = min(Q[2],Q[3]);
@@ -241,20 +241,20 @@ Vector4d intersection(const Vector4d& Q){
     // Calcola l'estremo destro dell'intersezione
     double dx = min(b, d);
     //Se gli intervalli non si sovrappongono, l'intersezione sarà vuota
-    if (sx > dx) {
+    if (sx > (dx-tol)) {
         sx = dx = numeric_limits<double>::quiet_NaN(); // Non un numero
     }
-    double other_sx = (a < c) ? a : c; // other_sx è pari ad a se a<c, altrimenti è pari a c
-    double other_dx = (d > b) ? d : b; // other_dx è pari a d se d>b, altrimenti è pari a b
+    double other_sx = (a < (c+tol)) ? a : c; // other_sx è pari ad a se a<c, altrimenti è pari a c
+    double other_dx = (d > (b-tol)) ? d : b; // other_dx è pari a d se d>b, altrimenti è pari a b
     Vector4d output = {sx,dx,other_sx,other_dx}; // in ordine restituiamo l'intervallo di intersezione e gli altri due estremi ordinati
     return output;
 }
 
-bool almostEqual(double a, double b, double tol) {
+bool almostEqual(const double a, const double b, const double &tol) {
     return fabs(a - b) < tol;
 }
 
-bool arePlanesParallel(Vector4d v1,Vector4d v2, double tol) {
+bool arePlanesParallel(const Vector4d v1, const Vector4d v2, double &tol) {
 
     Vector3d w1 = v1.head(3);
     Vector3d w2 = v2.head(3);
@@ -262,7 +262,7 @@ bool arePlanesParallel(Vector4d v1,Vector4d v2, double tol) {
 
     bool par = true;
 
-    if(v.maxCoeff() > tol)
+    if(abs(v.maxCoeff()) > tol)
         par = false;
 
     return par;
