@@ -8,7 +8,7 @@ using namespace FracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR10_data.txt";
+    string filepath = "./FR50_data.txt";
     if(!importFracture(filepath, fractures))
     {
         return 1;
@@ -17,11 +17,11 @@ int main()
     fractures.NumTracce.resize(fractures.NumberFractures);
     Traces traces;
     unsigned int numberTraces = 0;
-    bool flag;
+    //bool flag;
     for (unsigned int id1 = 0; id1<fractures.NumberFractures; id1++) {
         for (unsigned int id2 = id1+1; id2<fractures.NumberFractures; id2++) {
             if (areClose(fractures,id1,id2)){
-                flag = false;
+                //flag = false;
                 Vector4d coeff1 = Piano(id1,fractures);
                 Vector4d coeff2 = Piano(id2,fractures);
                 if(!arePlanesParallel(coeff1[0],coeff1[1],coeff1[2],coeff2[0],coeff2[1],coeff2[2],pow(10,-10))){ //SISTEMARE QUI
@@ -47,17 +47,17 @@ int main()
                                 if (Q[4]>= 0 && Q[4]<=1){ // Q[4] è s!!! e tau?
                                     intersectionPoints.col(points) = Q.head(4);
                                     points++;
-                                    flag = true;
+                                    //flag = true;
                                 };
                             };
                         }
                     }
-                    if(flag && points == 4){
+                    if(points == 4){
                         Vector4d t_star = intersectionPoints.row(3);
                         Vector4d t = intersection(t_star);
                         if(!isnan(t[0])){
-                            array<unsigned int,2> v = {id1,id2};
-                            traces.FracturesId[numberTraces] = v;
+                            array<unsigned int,4> v = {id1,id2,0,0};
+                            traces.FracturesId.push_back(v);
                             Matrix<double,3,2> vertices;
                             vertices.col(0) = r.point + t[0]*r.direction;
                             vertices.col(1) = r.point + t[1]*r.direction;
@@ -70,16 +70,16 @@ int main()
                             double c = min(t_star[2],t_star[3]);
                             double d = max(t_star[2],t_star[3]);
                             if (t[0] == a && t[1] == b){
-                                traces.Tips[numberTraces][0] = false;
-                                traces.Tips[numberTraces][1] = true;
+                                traces.FracturesId[numberTraces][2] = 0;
+                                traces.FracturesId[numberTraces][3] = 1;
                             }
                             else if (t[0] == c && t[1] == d){
-                                traces.Tips[numberTraces][0] = true;
-                                traces.Tips[numberTraces][1] = false;
+                                traces.FracturesId[numberTraces][2] = 1;
+                                traces.FracturesId[numberTraces][3] = 0;
                             }
                             else{
-                                traces.Tips[numberTraces][0] = true;
-                                traces.Tips[numberTraces][1] = true;
+                                traces.FracturesId[numberTraces][2] = 1;
+                                traces.FracturesId[numberTraces][3] = 1;
                             }
                             numberTraces++;
                             fractures.NumTracce[id1]++;
@@ -102,13 +102,12 @@ int main()
 
     for(unsigned int i = 0; i < fractures.NumberFractures; i++)
     {
-
         for(auto& couple : mapElements){
             if(traces.FracturesId[couple.first][0] == i){
-                fractures.tracce[i].push_back(make_tuple(couple.first, traces.Tips[couple.first][0], couple.second));
+                fractures.tracce[i].push_back(make_tuple(couple.first, traces.FracturesId[couple.first][2], couple.second));
             }
             else if(traces.FracturesId[couple.first][1] == i){
-                fractures.tracce[i].push_back(make_tuple(couple.first, traces.Tips[couple.first][1], couple.second));
+                fractures.tracce[i].push_back(make_tuple(couple.first, traces.FracturesId[couple.first][3], couple.second));
             }
         }
         stable_sort(fractures.tracce[i].begin(), fractures.tracce[i].end(), [](const auto& a, const auto& b) {
