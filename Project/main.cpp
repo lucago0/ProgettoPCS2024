@@ -109,5 +109,28 @@ int main()
 
     OutputFile(traces,fractures);
 
+    /* for (unsigned int id = 0; id < fractures.NumberFractures; id++) {
+        for (unsigned int j = 0; j < fractures.NumTracce[id]; j++)
+            for (unsigned int idTrace = 0; idTrace < fractures.tracce[id][j][0]; idTrace++){
+                unsigned int n = fractures.Vertices[id].cols();
+                for (unsigned int column = 0; column < n; column++){
+                    Vector3d firstPoint = fractures.Vertices.col(column);
+                    Vector3d secondPoint = fractures.Vertices.col((column+1)%n);
+                    if ((traces.Vertices[idTrace].col(0)-firstPoint).cross(secondPoint-firstPoint)==Zeros(3)){
+                        unsigned int k = 1;
+                        while((traces.Vertices[idTrace].col(1)-currentPoint).cross(consecutivePoint-currentPoint)==Zeros(3)){
+                            currentPoint = fractures.Vertices.col(column+k);
+                            consecutivePoint = fractures.Vertices.col((column+k+1)%n);
+                            k++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    */
+
+
+
     return 0;
 }
