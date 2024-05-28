@@ -256,8 +256,8 @@ bool almostEqual(double a, double b, double tol) {
 
 bool arePlanesParallel(Vector4d v1,Vector4d v2, double tol) {
 
-    Vector3d w1(v1.begin(),v1.begin()+3);
-    Vector3d w2(v2.begin(),v2.begin()+3);
+    Vector3d w1 = v1.head(3);
+    Vector3d w2 = v2.head(3);
     Vector3d v = w1.cross(w2);
 
     bool par = true;

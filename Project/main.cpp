@@ -8,7 +8,7 @@ using namespace FracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR50_data.txt";
+    string filepath = "./FR10_data.txt";
     if(!importFracture(filepath, fractures))
     {
         return 1;
@@ -17,11 +17,9 @@ int main()
     fractures.NumTracce.resize(fractures.NumberFractures);
     Traces traces;
     unsigned int numberTraces = 0;
-    //bool flag;
     for (unsigned int id1 = 0; id1<fractures.NumberFractures; id1++) {
         for (unsigned int id2 = id1+1; id2<fractures.NumberFractures; id2++) {
             if (areClose(fractures,id1,id2)){
-                //flag = false;
                 Vector4d coeff1 = Piano(id1,fractures);
                 Vector4d coeff2 = Piano(id2,fractures);
                 if(!arePlanesParallel(coeff1,coeff2,pow(10,-10))){
@@ -42,7 +40,6 @@ int main()
                                 if (Q[4]>= 0 && Q[4]<=1){ // Q[4] è s!!! e tau?
                                     intersectionPoints.col(points) = Q.head(4);
                                     points++;
-                                    //flag = true;
                                 };
                             };
                         }
