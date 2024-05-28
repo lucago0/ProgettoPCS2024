@@ -72,7 +72,7 @@ void OutputFile(Traces& TR, Fractures& FR)
     ofstream ofs(Tracce);
     ofstream ofs2(FrattTracc);
 
-    if (ofs.fail())
+    if (ofs.fail() || ofs2.fail())
     {
         cout << "Impossibile creare il file di output" << endl;
         return;
@@ -254,16 +254,18 @@ bool almostEqual(double a, double b, double tol) {
     return fabs(a - b) < tol;
 }
 
-bool arePlanesParallel(double A1, double B1, double C1, double A2, double B2, double C2, double tol) {
-    // Compute the normal vectors of the planes
-    double normal1_length = sqrt(A1 * A1 + B1 * B1 + C1 * C1);
-    double normal2_length = sqrt(A2 * A2 + B2 * B2 + C2 * C2);
+bool arePlanesParallel(Vector4d v1,Vector4d v2, double tol) {
 
-    // Check if the normal vectors are parallel (i.e., dot product is 1 or -1)
-    double dot_product = (A1 * A2 + B1 * B2 + C1 * C2) / (normal1_length * normal2_length);
+    Vector3d w1(v1.begin(),v1.begin()+3);
+    Vector3d w2(v2.begin(),v2.begin()+3);
+    Vector3d v = w1.cross(w2);
 
-    // Check if the dot product is close to 1 or -1 within tolerance
-    return almostEqual(dot_product, 1.0, tol) || almostEqual(dot_product, -1.0, tol);
+    bool par = true;
+
+    if(v.maxCoeff() > tol)
+        par = false;
+
+    return par;
 }
 
 bool compareTuple(const tuple<unsigned int, bool, double>& a, const tuple<unsigned int, bool, double>& b) {

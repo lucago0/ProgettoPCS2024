@@ -24,7 +24,7 @@ int main()
                 //flag = false;
                 Vector4d coeff1 = Piano(id1,fractures);
                 Vector4d coeff2 = Piano(id2,fractures);
-                if(!arePlanesParallel(coeff1[0],coeff1[1],coeff1[2],coeff2[0],coeff2[1],coeff2[2],pow(10,-10))){ //SISTEMARE QUI
+                if(!arePlanesParallel(coeff1,coeff2,pow(10,-10))){
                     Line r = Inter(coeff1,coeff2);
                     Line r_j;
                     Matrix<double,4,4> intersectionPoints;

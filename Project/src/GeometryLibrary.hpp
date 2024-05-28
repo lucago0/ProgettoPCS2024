@@ -43,7 +43,7 @@ Line Inter(const Vector4d &coeff1, const Vector4d &coeff2);
 VectorXd PuntiIntersRetta(const Line& r,const Line& rj);
 Vector4d intersection(const Vector4d& Q);
 bool almostEqual(double a, double b, double tol);
-bool arePlanesParallel(double A1, double B1, double C1, double A2, double B2, double C2, double tol);
+bool arePlanesParallel(Vector4d v1, Vector4d v2, double tol);
 bool compareByValue(const pair<unsigned int, double> &a, const pair<unsigned int, double> &b);
 bool compareTuple(const tuple<unsigned int, bool, double>& a, const tuple<unsigned int, bool, double>& b);
 
