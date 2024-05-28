@@ -31,15 +31,10 @@ int main()
                     unsigned int points = 0;
                     for(unsigned int i = 0; i < 2; i++){
                         unsigned int currentId = (i==0) ? id1:id2;
-                        for (unsigned int j=0; j<fractures.Vertices[currentId].cols(); j++){
-                            if(j<fractures.Vertices[currentId].cols()-1){
-                                r_j.point = fractures.Vertices[currentId].col(j);
-                                r_j.direction = (fractures.Vertices[currentId].col(j+1)-fractures.Vertices[currentId].col(j));
-                            }
-                            else{
-                                r_j.point = fractures.Vertices[currentId].col(j);
-                                r_j.direction = (fractures.Vertices[currentId].col(0)-fractures.Vertices[currentId].col(j));
-                            }
+                        unsigned int n = fractures.Vertices[currentId].cols();
+                        for (unsigned int j=0; j<n; j++){
+                            r_j.point = fractures.Vertices[currentId].col(j);
+                            r_j.direction = fractures.Vertices[currentId].col((j+1)%n)-fractures.Vertices[currentId].col(j);
                             // mi assicuro che ci sia intersezione tra r ed r_j con cross
                             Vector3d test = (r.direction).cross(r_j.direction);
                             if(!almostEqual(test[0],0,pow(10,-10)) || !almostEqual(test[1],0,pow(10,-10)) || !almostEqual(test[2],0,pow(10,-10))){
