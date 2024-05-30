@@ -74,8 +74,8 @@ double tol = pow(10,-10);
      Vector4d plane2 = {0.09, 0.42, 0.52, -0.46};
 
      Line r;
-     r.point = {0.2807017543859,1.03508771929824,0};
-     r.direction = {-0.0484000000000,0.08800000000000,-0.0626999999999};
+     r.point = {0.28070175438596,1.0350877192982,0};
+     r.direction = {-0.0484000000000000,0.08800000000000,-0.06269999999999};
 
      EXPECT_TRUE(Inter(plane1,plane2,tol).point.isApprox(r.point,tol));
      EXPECT_TRUE(Inter(plane1,plane2,tol).direction.isApprox(r.direction,tol));

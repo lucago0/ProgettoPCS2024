@@ -156,6 +156,8 @@ Vector4d Piano(const unsigned int& id, Fractures& FR)
 Line Inter(const Vector4d& coeff1, const Vector4d& coeff2,const double& tol)
 {
     Line line;
+    line.direction = {0,0,0};
+    line.point = {0,0,0};
     Vector3d v1;
     Vector3d v2;
     v1 = coeff1.head(3);
@@ -262,7 +264,7 @@ bool arePlanesParallel(const Vector4d v1, const Vector4d v2, double &tol) {
 
     bool par = true;
 
-    if(abs(v.maxCoeff()) > tol)
+    if(abs(v[0]) > tol || abs(v[1]) > tol || abs(v[2]) > tol)
         par = false;
 
     return par;

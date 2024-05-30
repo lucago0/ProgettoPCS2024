@@ -8,13 +8,13 @@ using namespace FracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR82_data.txt";
+    string filepath = "./FR10_data.txt";
     if(!importFracture(filepath, fractures))
     {
         return 1;
     }
 
-    double tol = max(pow(10,-12), numeric_limits<double>::epsilon());
+    double tol = max(pow(10,-10), numeric_limits<double>::epsilon());
 
     fractures.NumTracce.resize(fractures.NumberFractures);
     fractures.CoeffPiano.resize(fractures.NumberFractures);
