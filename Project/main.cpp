@@ -2,7 +2,7 @@
 #include <GeometryLibrary.hpp>
 #include <Utils.hpp>
 
-    using namespace std;
+using namespace std;
 using namespace FracturesLib;
 
 int main()
@@ -99,17 +99,19 @@ int main()
     // Ordina il vettore in base ai valori
     sort(mapElements.begin(), mapElements.end(), compareByValue);
 
-
-    for(unsigned int i = 0; i < fractures.NumberFractures; i++)
-    {
-        for(auto& couple : mapElements){
-            if(traces.FracturesId[couple.first][0] == i){
-                fractures.tracce[i].push_back(make_tuple(couple.first, traces.FracturesId[couple.first][2], couple.second));
+    for (unsigned int i = 0; i < fractures.NumberFractures; i++) {
+        fractures.tracce[i].resize(fractures.NumTracce[i]);
+        unsigned int index = 0;
+        for (const auto& couple : mapElements) {
+            if (traces.FracturesId[couple.first][0] == i) {
+                fractures.tracce[i][index++] = make_tuple(couple.first, traces.FracturesId[couple.first][2], couple.second);
             }
-            else if(traces.FracturesId[couple.first][1] == i){
-                fractures.tracce[i].push_back(make_tuple(couple.first, traces.FracturesId[couple.first][3], couple.second));
+            else if (traces.FracturesId[couple.first][1] == i) {
+                fractures.tracce[i][index++] = make_tuple(couple.first, traces.FracturesId[couple.first][3], couple.second);
             }
         }
+
+        // Ordinamento stabile
         stable_sort(fractures.tracce[i].begin(), fractures.tracce[i].end(), [](const auto& a, const auto& b) {
             return get<1>(a) < get<1>(b);
         });
