@@ -8,7 +8,7 @@ using namespace FracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR10_data.txt";
+    string filepath = "./FR362_data.txt";
     if(!importFracture(filepath, fractures))
     {
         return 1;
@@ -17,6 +17,7 @@ int main()
     double tol = max(pow(10,-10), numeric_limits<double>::epsilon());
 
     fractures.NumTracce.resize(fractures.NumberFractures);
+    fractures.NumTracce.assign(fractures.NumberFractures,0);
     fractures.CoeffPiano.resize(fractures.NumberFractures);
     fractures.CoeffPiano.assign(fractures.NumberFractures, Vector4d::Zero());
     Traces traces;
@@ -62,7 +63,7 @@ int main()
                             vertices.col(0) = r.point + t[0]*r.direction;
                             vertices.col(1) = r.point + t[1]*r.direction;
                             traces.Lengths[numberTraces] = sqrt(distanceSquared(vertices.col(0),vertices.col(1)));
-                            traces.Vertices.insert(make_pair(numberTraces, vertices));
+                            traces.Vertices.push_back(vertices);
 
                             // Tips
                             double a = min(t_star[0],t_star[1]);
@@ -99,6 +100,7 @@ int main()
     // Ordina il vettore in base ai valori
     sort(mapElements.begin(), mapElements.end(), compareByValue);
 
+    fractures.tracce.resize(fractures.NumberFractures);
     for (unsigned int i = 0; i < fractures.NumberFractures; i++) {
         fractures.tracce[i].resize(fractures.NumTracce[i]);
         unsigned int index = 0;
@@ -116,6 +118,8 @@ int main()
             return get<1>(a) < get<1>(b);
         });
     }
+
+    traces.Lengths.clear(); //per evitare il doppione di memoria
 
     OutputFile(traces,fractures);
 

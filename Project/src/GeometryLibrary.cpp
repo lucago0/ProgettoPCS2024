@@ -27,6 +27,7 @@ bool importFracture(const string& filename, Fractures& fracture) {
     getline(file,line);
     fracture.NumberFractures = stoi(line);
     int numFrac = stoi(line);
+    fracture.Vertices.resize(numFrac);
     char pv;
     int numVertices;
     unsigned int k;
@@ -51,7 +52,7 @@ bool importFracture(const string& filename, Fractures& fracture) {
         file >> pv;
 
         // Add fracture data to the fractures map
-        fracture.Vertices.insert(make_pair(k, actualVert));
+        fracture.Vertices[k] = actualVert;
     }
     file.close();
     return true;

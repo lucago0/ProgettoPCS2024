@@ -13,17 +13,17 @@ namespace FracturesLib{
 
 struct Fractures{
     unsigned int NumberFractures = 0;
-    map<unsigned int, Matrix<double, 3, Dynamic>> Vertices;
+    vector<Matrix<double, 3, Dynamic>> Vertices;
     vector<Vector4d> CoeffPiano;
-    VectorXi NumTracce;
-    map<unsigned int, vector<tuple<unsigned int, bool, double>>> tracce;
+    vector<unsigned int> NumTracce = {};
+    vector<vector<tuple<unsigned int, bool, double>>> tracce;
     // map<unsigned int, Matrix<double, 3, Dynamic>> SubFractures = {};
 };
 
 struct Traces{
     unsigned int NumberTraces = 0;
     vector<array<unsigned int, 4>> FracturesId; //{id1,id2,tips1,tips2}
-    map<unsigned int, Matrix<double,3,2>> Vertices;
+    vector<Matrix<double,3,2>> Vertices;
     //map<unsigned int, array<bool,2>> Tips;
     map<unsigned int, double> Lengths;
 };

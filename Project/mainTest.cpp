@@ -16,8 +16,8 @@ double tol = pow(10,-10);
      poly2 << 1.17,0.19,0.09,1.07,
          0.85,1.05,0.54,0.34,
          0.02,0.02,0.44,0.44;
-     frac.Vertices.insert(make_pair(0,poly1));
-     frac.Vertices.insert(make_pair(1,poly2));
+     frac.Vertices[0] = poly1;
+     frac.Vertices[1] = poly2;;
      unsigned int id1 = 0;
      unsigned int id2 = 1;
 
@@ -34,8 +34,8 @@ double tol = pow(10,-10);
      poly2 << 5,5,6.42,6.42,
          0,2,2,0,
          6.31,6.31,7.72,7.72;
-     frac.Vertices.insert(make_pair(0,poly1));
-     frac.Vertices.insert(make_pair(1,poly2));
+     frac.Vertices[0] = poly1;
+     frac.Vertices[1] = poly2;;
      unsigned int id1 = 0;
      unsigned int id2 = 1;
 
@@ -48,7 +48,7 @@ double tol = pow(10,-10);
      poly1 << 0.68,0.21,0.08,0.55,
          0.52,0.99,0.86,0.39,
          0.19,0.19,0.6,0.6;
-     frac.Vertices.insert(make_pair(0,poly1));
+     frac.Vertices[0] = poly1;
 
      unsigned int id = 0;
      Vector4d expected = {0.1926999999999, 0.1927, 0.1222, -0.254458};
@@ -61,7 +61,7 @@ double tol = pow(10,-10);
      poly1 << 5.31,5.31,6.72,6.72,
          0,2,2,0,
          2.48,2.48,1.07,1.07;
-     frac.Vertices.insert(make_pair(0,poly1));
+     frac.Vertices[0] = poly1;
 
      unsigned int id = 0;
 
