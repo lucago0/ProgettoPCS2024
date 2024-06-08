@@ -123,26 +123,30 @@ int main()
 
     OutputFile(traces,fractures);
 
-    /* for (unsigned int id = 0; id < fractures.NumberFractures; id++) {
-        for (unsigned int j = 0; j < fractures.NumTracce[id]; j++)
-            for (unsigned int idTrace = 0; idTrace < fractures.tracce[id][j][0]; idTrace++){
-                unsigned int n = fractures.Vertices[id].cols();
-                for (unsigned int column = 0; column < n; column++){
-                    Vector3d firstPoint = fractures.Vertices.col(column);
-                    Vector3d secondPoint = fractures.Vertices.col((column+1)%n);
-                    if ((traces.Vertices[idTrace].col(0)-firstPoint).cross(secondPoint-firstPoint)==Zeros(3)){
-                        unsigned int k = 1;
-                        while((traces.Vertices[idTrace].col(1)-currentPoint).cross(consecutivePoint-currentPoint)==Zeros(3)){
-                            currentPoint = fractures.Vertices.col(column+k);
-                            consecutivePoint = fractures.Vertices.col((column+k+1)%n);
-                            k++;
-                        }
-                    }
-                }
-            }
+    fractures.SubFracVert.resize(fractures.NumberFractures);
+
+    PolygonalMesh mesh;
+    for (unsigned int idFrac = 0; idFrac < fractures.NumberFractures; idFrac ++){
+        SubFracture original;
+        original.Vertices = fractures.Vertices[idFrac];
+        for(unsigned int z = 0; z < original.Vertices.cols(); z++){
+            mesh.CoordinateCell0Ds.push_back(original.Vertices.col(z));
+            array<unsigned int, 2> idVertici;
+            unsigned int a = mesh.NumberCell0Ds+z;
+            unsigned int b = mesh.NumberCell0Ds+((z+1)%original.Vertices.cols());
+            idVertici = {a,b};
+            mesh.VerticesCell1Ds.push_back(idVertici);
+            original.VerticesId.push_back(mesh.NumberCell0Ds+z);
+            original.EdgesId.push_back(mesh.NumberCell0Ds+z);
         }
+        mesh.NumberCell0Ds = mesh.NumberCell0Ds + original.Vertices.cols(); //inserisco i punti esterni originali
+        mesh.NumberCell1Ds = mesh.NumberCell1Ds + original.Vertices.cols();
+
+        for(unsigned int k = 0; k < fractures.tracce[idFrac].size(); k++){
+            original.traceId.push_back(get<0>(fractures.tracce[idFrac][k]));
+        }
+        splitSubFractures(original,fractures,traces,mesh,idFrac,tol);
     }
-    */
 
     return 0;
 }

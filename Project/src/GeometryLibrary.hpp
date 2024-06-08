@@ -16,13 +16,20 @@ struct Fractures{
     vector<Matrix<double, 3, Dynamic>> Vertices;
     vector<Vector4d> CoeffPiano;
     vector<unsigned int> NumTracce = {};
-    vector<vector<tuple<unsigned int, bool, double>>> tracce;
-    // map<unsigned int, Matrix<double, 3, Dynamic>> SubFractures = {};
+    vector<vector<tuple<unsigned int, bool, double>>> tracce; //ad ogni id frattura associo vettore di idtracce con le info per ogni traccia
+    vector<vector<Matrix<double, 3, Dynamic>>> SubFracVert; //vertici sotto frattura
+};
+
+struct SubFracture{
+    Matrix<double, 3 ,Dynamic> Vertices;
+    vector<unsigned int> VerticesId;
+    vector<unsigned int> EdgesId;
+    vector<unsigned int> traceId;
 };
 
 struct Traces{
     unsigned int NumberTraces = 0;
-    vector<array<unsigned int, 4>> FracturesId; //{id1,id2,tips1,tips2}
+    vector<array<unsigned int, 4>> FracturesId; //{id1,id2,tips1,tips2} (id1 e id2 sono gli id delle fratture associate ad idtraccia
     vector<Matrix<double,3,2>> Vertices;
     //map<unsigned int, array<bool,2>> Tips;
     map<unsigned int, double> Lengths;
@@ -35,11 +42,11 @@ struct Line{
 struct PolygonalMesh{
     unsigned int NumberCell0Ds = 0;
     vector<unsigned int> IdCell0Ds = {};
-    vector<Vector2d> CoordinateCell0Ds = {};
+    vector<Vector3d> CoordinateCell0Ds = {};
 
     unsigned int NumberCell1Ds = 0;
     vector<unsigned int> IdCell1Ds = {};
-    vector<Vector2i> VerticesCell1Ds = {};
+    vector<array<unsigned int,2>> VerticesCell1Ds = {};
 
     unsigned int NumberCell2Ds = 0;
     vector<unsigned int> IdCell2Ds = {};
@@ -63,5 +70,8 @@ bool almostEqual(const double a,const double b,const double& tol);
 bool arePlanesParallel(const Vector4d v1, const Vector4d v2, double& tol);
 bool compareByValue(const pair<unsigned int, double> &a, const pair<unsigned int,const double> &b);
 bool compareTuple(const tuple<unsigned int, bool, double>& a, const tuple<unsigned int, bool, double>& b);
+double posizionePuntoPiano(const Vector4d& coeffPiano, const Vector3d& coordPunto);
+void splitSubFractures(SubFracture& subFract, const Fractures& fractures, const Traces& traces, PolygonalMesh &mesh, const unsigned int &idFrac, double& tol);
+
 
 };

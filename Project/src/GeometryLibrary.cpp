@@ -275,4 +275,108 @@ bool compareTuple(const tuple<unsigned int, bool, double>& a, const tuple<unsign
     return get<1>(a) < get<1>(b); // Ordina in base al valore booleano all'interno delle tuple
 }
 
+double posizionePuntoPiano(const Vector4d& coeffPiano, const Vector3d& coordPunto){
+    double a = coeffPiano[0];
+    double b = coeffPiano[1];
+    double c = coeffPiano[2];
+    double d = coeffPiano[3];
+    double x = coordPunto[0];
+    double y = coordPunto[1];
+    double z = coordPunto[2];
+
+    return a*x + b*y +c*z + d;
+}
+
+void splitSubFractures(SubFracture& subFract, const Fractures& fractures,const Traces& traces,PolygonalMesh& mesh,const unsigned int& idFrac,double& tol){
+    if (subFract.traceId.size()==0){
+        //importSubFract
+        //cancella SubFract
+    }
+    else{
+    array<SubFracture,2> sottofratt;
+    unsigned int idTraccia = subFract.traceId[0];
+    Line currTrac;
+    currTrac.point = traces.Vertices[idTraccia].col(0); //punto iniziale
+    Vector3d puntoFinTraccia = traces.Vertices[idTraccia].col(1);
+    //estraggo direzione traccia
+    currTrac.direction = puntoFinTraccia-currTrac.point;
+    bool divisione = 0;
+    for(unsigned int latoFratt = 0; latoFratt < subFract.Vertices.cols(); latoFratt ++){
+        Line currLato;
+        currLato.point = subFract.Vertices.col(latoFratt);
+        currLato.direction = subFract.Vertices.col((latoFratt+1)%subFract.Vertices.cols())-currLato.point;
+        // mi assicuro che ci sia intersezione tra traccia e lato con cross
+        Vector3d test = (currTrac.direction).cross(currLato.direction);
+        if(!almostEqual(test[0],0,tol) || !almostEqual(test[1],0,tol) || !almostEqual(test[2],0,tol)){
+            VectorXd Q = PuntiIntersRetta(currTrac, currLato); // Q,t,s
+            if ((Q[4]>= (0-tol)) && (Q[4]<=(1+tol))){ // Q[4] è s
+                sottofratt[divisione].Vertices.conservativeResize(3, sottofratt[divisione].Vertices.cols() + 2);
+                sottofratt[!divisione].Vertices.conservativeResize(3, sottofratt[!divisione].Vertices.cols() + 1);
+                sottofratt[divisione].Vertices.col(sottofratt[divisione].Vertices.cols() - 2) = currLato.point;
+                sottofratt[divisione].Vertices.col(sottofratt[divisione].Vertices.cols() - 1) = currLato.point+Q[4]*currLato.direction;
+                divisione = !divisione;
+                sottofratt[divisione].Vertices.col(sottofratt[divisione].Vertices.cols() - 1) = currLato.point+Q[4]*currLato.direction;
+                mesh.CoordinateCell0Ds.push_back(currLato.point+Q[4]*currLato.direction);
+                mesh.NumberCell0Ds++;
+                mesh.VerticesCell1Ds[subFract.EdgesId[latoFratt]] = {numeric_limits<unsigned int>::max(),numeric_limits<unsigned int>::max()};
+
+                array<unsigned int,2> temp = {subFract.VerticesId[latoFratt], mesh.NumberCell0Ds};
+                mesh.VerticesCell1Ds.push_back(temp);
+                mesh.VerticesCell1Ds.push_back({mesh.NumberCell0Ds, subFract.VerticesId[(latoFratt+1)%subFract.Vertices.cols()]});
+            }
+            else{
+                sottofratt[divisione].Vertices.conservativeResize(3, sottofratt[divisione].Vertices.cols() + 1);
+                sottofratt[divisione].Vertices.col(sottofratt[divisione].Vertices.cols() - 1) = currLato.point;
+            }
+        }
+    }
+    for(unsigned int m = 1; m < subFract.traceId.size(); m++){
+        unsigned int idTr = subFract.traceId[m];
+        Vector3d puntoInTr = traces.Vertices[idTr].col(0);
+        Vector3d puntoFinTr = traces.Vertices[idTr].col(1);
+        Vector4d pianoTemp;
+        if(traces.FracturesId[idTr][0] == idFrac){
+            pianoTemp = fractures.CoeffPiano[traces.FracturesId[idTr][1]];
+        }
+        else if(traces.FracturesId[idTr][1] == idFrac){
+            pianoTemp = fractures.CoeffPiano[traces.FracturesId[idTr][0]];
+        };
+
+        if (posizionePuntoPiano(pianoTemp, sottofratt[0].Vertices.col(0))>0){
+            if(posizionePuntoPiano(pianoTemp,puntoInTr) > 0 && posizionePuntoPiano(pianoTemp,puntoFinTr) > 0){
+                sottofratt[0].traceId.push_back(idTr);
+            }
+            else if(posizionePuntoPiano(pianoTemp,puntoInTr) < 0 && posizionePuntoPiano(pianoTemp,puntoFinTr) < 0){
+                sottofratt[1].traceId.push_back(idTr);
+            }
+        }
+        else if(posizionePuntoPiano(pianoTemp, sottofratt[1].Vertices.col(1))>0){
+            if(posizionePuntoPiano(pianoTemp,puntoInTr) > 0 && posizionePuntoPiano(pianoTemp,puntoFinTr) > 0){
+                sottofratt[1].traceId.push_back(idTr);
+            }
+            else if(posizionePuntoPiano(pianoTemp,puntoInTr) < 0 && posizionePuntoPiano(pianoTemp,puntoFinTr) < 0){
+                sottofratt[0].traceId.push_back(idTr);
+            }
+        }
+        else{
+            sottofratt[0].traceId.push_back(idTr);
+            sottofratt[1].traceId.push_back(idTr);
+        };
+    }
+    splitSubFractures(sottofratt[0],fractures,traces,mesh,idFrac,tol);
+    splitSubFractures(sottofratt[1],fractures,traces,mesh,idFrac,tol);
+    }
+}
+
+// void importSubFract(SubFracture& subFr, PolygonalMesh& mesh){
+//     for(unsigned int latoFrat = 0; latoFrat < subFr.Vertices.cols(); latoFrat ++){
+
+
+//         if(//non esiste già){
+//         mesh.NumberCell0Ds++;
+//         //}
+//     }
+// }
+
+
 };
