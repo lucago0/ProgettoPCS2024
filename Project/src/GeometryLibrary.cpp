@@ -314,11 +314,21 @@ void splitSubFractures(SubFracture& subFract, const Fractures& fractures,const T
                 sottofratt[!divisione].Vertices.conservativeResize(3, sottofratt[!divisione].Vertices.cols() + 1);
                 sottofratt[divisione].Vertices.col(sottofratt[divisione].Vertices.cols() - 2) = currLato.point;
                 sottofratt[divisione].Vertices.col(sottofratt[divisione].Vertices.cols() - 1) = currLato.point+Q[4]*currLato.direction;
-                divisione = !divisione;
-                sottofratt[divisione].Vertices.col(sottofratt[divisione].Vertices.cols() - 1) = currLato.point+Q[4]*currLato.direction;
+                sottofratt[divisione].VerticesId.push_back(subFract.VerticesId[latoFratt]);
+                sottofratt[divisione].VerticesId.push_back(mesh.NumberCell0Ds++);
                 mesh.CoordinateCell0Ds.push_back(currLato.point+Q[4]*currLato.direction);
-                mesh.NumberCell0Ds++;
                 mesh.VerticesCell1Ds[subFract.EdgesId[latoFratt]] = {numeric_limits<unsigned int>::max(),numeric_limits<unsigned int>::max()};
+                mesh.VerticesCell1Ds.push_back({subFract.VerticesId[latoFratt], mesh.NumberCell0Ds});
+                mesh.NumberCell1Ds++;
+                sottofratt[divisione].EdgesId.push_back(mesh.NumberCell1Ds);
+
+                divisione = !divisione;
+
+                sottofratt[divisione].Vertices.col(sottofratt[divisione].Vertices.cols() - 1) = currLato.point+Q[4]*currLato.direction;
+                sottofratt[divisione].VerticesId.push_back(mesh.NumberCell0Ds);
+                mesh.VerticesCell1Ds[subFract.EdgesId[latoFratt]] = {numeric_limits<unsigned int>::max(),numeric_limits<unsigned int>::max()};
+
+
 
                 array<unsigned int,2> temp = {subFract.VerticesId[latoFratt], mesh.NumberCell0Ds};
                 mesh.VerticesCell1Ds.push_back(temp);
@@ -368,15 +378,10 @@ void splitSubFractures(SubFracture& subFract, const Fractures& fractures,const T
     }
 }
 
-// void importSubFract(SubFracture& subFr, PolygonalMesh& mesh){
-//     for(unsigned int latoFrat = 0; latoFrat < subFr.Vertices.cols(); latoFrat ++){
-
-
-//         if(//non esiste già){
-//         mesh.NumberCell0Ds++;
-//         //}
-//     }
-// }
+void importSubFract(SubFracture& subFr, PolygonalMesh& mesh){
+    mesh.VerticesCell2Ds[mesh.NumberCell2Ds++] = subFr.traceId;
+    mesh.EdgesCell2Ds[mesh.NumberCell2Ds] = subFr.EdgesId;
+}
 
 
 };

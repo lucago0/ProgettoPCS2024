@@ -50,8 +50,8 @@ struct PolygonalMesh{
 
     unsigned int NumberCell2Ds = 0;
     vector<unsigned int> IdCell2Ds = {};
-    vector<VectorXi> VerticesCell2Ds = {};
-    vector<VectorXi> EdgesCell2Ds = {};
+    vector<vector<unsigned int>> VerticesCell2Ds = {};
+    vector<vector<unsigned int>> EdgesCell2Ds = {};
 
     /* double tau = numeric_limits<double>::epsilon();
     double tol = tau*tau/2; */
