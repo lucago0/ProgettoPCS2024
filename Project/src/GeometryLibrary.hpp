@@ -29,7 +29,7 @@ struct SubFracture{
 
 struct Traces{
     unsigned int numberOfTraces = 0;
-    vector<array<unsigned int, 4>> fracturesId; //{id1,id2,tips1,tips2} (id1 e id2 sono gli id delle fratture associate ad idtraccia
+    vector<array<unsigned int, 4>> fracturesId; //{id1,id2,tips1,tips2} id1 e id2 sono gli id delle fratture associate ad idtraccia
     vector<Matrix<double,3,2>> vertices;
     //map<unsigned int, array<bool,2>> Tips;
     map<unsigned int, double> lengths;
@@ -41,17 +41,18 @@ struct line{
 };
 struct PolygonalMesh{
     unsigned int numberCell0Ds = 0;
-    vector<unsigned int> idCell0Ds = {};
     vector<Vector3d> coordinateCell0Ds = {};
 
     unsigned int numberCell1Ds = 0;
-    vector<unsigned int> idCell1Ds = {};
     vector<array<unsigned int,2>> verticesCell1Ds = {};
+    vector<vector<unsigned int>> neighCell1Ds = {};
+    vector<bool> hasTwoNeighs;
+    vector<bool> isOn1D;
 
     unsigned int numberCell2Ds = 0;
-    vector<unsigned int> idCell2Ds = {};
     vector<vector<unsigned int>> verticesCell2Ds = {};
     vector<vector<unsigned int>> edgesCell2Ds = {};
+    vector<bool> isOn2D;
 
     /* double tau = numeric_limits<double>::epsilon();
     double tol = tau*tau/2; */

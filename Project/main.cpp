@@ -125,8 +125,160 @@ int main()
 
 
     PolygonalMesh mesh;
+    Vector3d initialPoint;
+    unsigned int idInitialEdge;
+    bool out;
 
-    /*
+    for (unsigned int idFrac = 0; idFrac < fractures.numberOfFractures; idFrac++){
+        unsigned int numberOfVertices = fractures.vertices[idFrac].cols();
+        mesh.verticesCell2Ds.resize(mesh.numberCell2Ds+1);
+        mesh.edgesCell2Ds.resize(mesh.numberCell2Ds+1);
+        for(unsigned int v = 0; v < numberOfVertices; v++){
+            mesh.coordinateCell0Ds.push_back(fractures.vertices[idFrac].col(v));
+            mesh.coordinateCell1Ds.push_back({mesh.numberCell0Ds+v,(mesh.numberCell0Ds+v+1)%numberOfVertices});
+            mesh.isOn1D.push_back(true);
+            mesh.hasNeigh.push_back(false);
+            mesh.neighCell1Ds.push_back(mesh.numberCell2Ds);
+            mesh.verticesCell2Ds[mesh.numberCell2Ds].push_back(mesh.numberCell0Ds+v);
+            mesh.edgesCell2Ds[mesh.numberCell2Ds].push_back(mesh.numberCell1Ds+v);
+        }
+        mesh.numberCell0Ds += numberOfVertices;
+        mesh.numberCell1Ds += numberOfVertices;
+        mesh.numberCell2Ds++;
+        mesh.isOn2D.push_back(true);
+
+        unsigned int numberOfCell2DsNow = mesh.numberCell2Ds;
+
+        for(unsigned int k = 0; k < fractures.traces[idFrac].size(); k++){
+            unsigned int idTrace = fractures.traces[idFrac][k];
+            bool found = false;
+            line trace;
+            trace.point = traces.vertices[idTrace].col(0);
+            trace.direction = traces.vertices[idTrace].col(1) - trace.point;
+            for(unsigned int idCell2D = numberOfCell2DsNow-1; idCell2D < mesh.numberCell2Ds; idCell2D++){
+                for(unsigned int idCell1D : mesh.edgesCell2Ds[idCell2D]){
+                    line edge;
+                    edge.point = mesh.coordinateCell0Ds[mesh.verticesCell1Ds[idCell1D][0]];
+                    edge.direction = mesh.coordinateCell0Ds[mesh.verticesCell1Ds[idCell1D][1]] - edge.point;
+                    Vector3d test = (trace.direction).cross(edge.direction);
+                    if (!almostEqual(test[0],0,tol) || !almostEqual(test[1],0,tol) || !almostEqual(test[2],0,tol)){
+                        VectorXd q = linesIntersection(trace,edge); // Q,t,s
+                        if ((q[4]>= (0-tol)) && (q[4]<=(1+tol))){ // Q[4] è s
+                            found = true;
+                            out = false;
+                            initialPoint = q.head(3);
+                            idInitialEdge = idCell1D;
+                            mesh.numberCell0Ds++;
+                            mesh.coordinateCell0Ds.push_back(initialPoint);
+                            break;
+                        };
+                    };
+                }
+                if (found){
+                    break;
+                };
+            }
+            // non passante?
+            // if (found){
+            //     mesh.isOn[initialEdge] = false;
+            //     mesh.numberCell1Ds += 2;
+            //     mesh.verticesCell1Ds.push_back({mesh.verticesCell1Ds[initialEdge][0],mesh.numberCell0Ds});
+            //     mesh.verticesCell1Ds.push_back({mesh.numberCell0Ds,mesh.verticesCell1Ds[initialEdge][1]});
+            //     mesh.isOn1D.push_back(true); mesh.isOn1D.push_back(true);
+            // }
+            while (!out){
+                for (unsigned int neigh : mesh.neighCell1Ds[idInitialEdge]){
+                    bool polygon = 0;
+                    unsigned int idInitialPoint = mesh.numberCell0Ds;
+                    for (unsigned int idCell1D : mesh.edgesCell2Ds[neigh]){
+                        line edge;
+                        edge.point = mesh.coordinateCell0Ds[mesh.verticesCell1Ds[idCell1D][0]];
+                        edge.direction = mesh.coordinateCell0Ds[mesh.verticesCell1Ds[idCell1D][1]] - edge.point;
+                        Vector3d test = (trace.direction).cross(edge.direction);
+                        if (!almostEqual(test[0],0,tol) || !almostEqual(test[1],0,tol) || !almostEqual(test[2],0,tol)){
+                            VectorXd q = linesIntersection(trace,edge);
+                            double t = q[3]; // Q,t,s
+                            if (almostEqual(q.head(3),initialPoint,tol)){
+                                mesh.isOn[idCell1D] = false;
+
+                                mesh.numberCell1Ds++;
+                                mesh.verticesCell1Ds.push_back({mesh.verticesCell1Ds[idCell1D][0],idInitialPoint});
+                                mesh.neighCell1Ds.push_back(mesh.numberCell2Ds+polygon);
+                                mesh.isOn1D.push_back(true);
+                                mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.verticesCell1Ds[idCell1D][0]);
+                                mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(idInitialPoint);
+                                mesh.edgesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.numberCell1Ds);
+
+                                polygon = !polygon;
+
+                                mesh.numberCell1Ds++;
+                                mesh.verticesCell1Ds.push_back({idInitialPoint,mesh.verticesCell1Ds[idCell1D][1]});
+                                mesh.neighCell1Ds.push_back(mesh.numberCell2Ds+polygon);
+                                mesh.isOn1D.push_back(true);
+                                mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(idInitialPoint);
+                                mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.verticesCell1Ds[idCell1D][0]);
+                                mesh.edgesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.numberCell1Ds);
+                            }
+                            else if (t>=(0-tol) && t<=(1+tol)){
+                                double s = q[4];
+
+                                mesh.numberCell0Ds++;
+                                mesh.coordinateCell0Ds.push_back(q.head(3));
+
+                                mesh.isOn[idCell1D] = false;
+
+                                mesh.numberCell1Ds++;
+                                mesh.verticesCell1Ds.push_back({mesh.verticesCell1Ds[idCell1D][0],mesh.numberCell0Ds});
+                                mesh.neighCell1Ds.push_back(mesh.numberCell2Ds+polygon);
+                                mesh.isOn1D.push_back(true);
+                                mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.verticesCell1Ds[idCell1D][0]);
+                                mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.numberCell0Ds);
+                                mesh.edgesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.numberCell1Ds);
+
+                                polygon = !polygon;
+
+                                mesh.numberCell1Ds++;
+                                mesh.verticesCell1Ds.push_back({mesh.numberCell0Ds,mesh.verticesCell1Ds[idCell1D][1]});
+                                mesh.neighCell1Ds.push_back(mesh.numberCell2Ds+polygon);
+                                mesh.isOn1D.push_back(true);
+                                mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.numberCell0Ds);
+                                mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.verticesCell1Ds[idCell1D][1]);
+                                mesh.edgesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.numberCell1Ds);
+                            }
+                            else {
+                                mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.verticesCell1Ds[idCell1D][0]);
+                                mesh.edgesCell2Ds[mesh.numberCell2Ds+polygon].push_back(idCell1D);
+                            }
+
+                            // Ed EF?
+                        }
+                    }
+                    mesh.isOn2D[neigh] = false;
+                    mesh.isOn2D.push_back(true); mesh.isOn2D.push_back(true);
+                }
+                if (!(s>=(0-tol) && s<=(1+tol))){
+                    out = true;
+                }
+            }
+
+        }
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
     for (unsigned int idFrac = 0; idFrac < fractures.numberOfFractures; idFrac ++){
         SubFracture original;
         original.Vertices = fractures.vertices[idFrac];
@@ -150,5 +302,5 @@ int main()
     }
     */
 
-    return 0;
+return 0;
 }
