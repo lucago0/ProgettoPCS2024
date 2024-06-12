@@ -46,7 +46,6 @@ struct PolygonalMesh{
     unsigned int numberCell1Ds = 0;
     vector<array<unsigned int,2>> verticesCell1Ds = {};
     vector<vector<unsigned int>> neighCell1Ds = {};
-    vector<bool> hasTwoNeighs;
     vector<bool> isOn1D;
 
     unsigned int numberCell2Ds = 0;
