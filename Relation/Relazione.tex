@@ -139,7 +139,7 @@ L'idea alla base della determinazione dei sotto-poligoni è la seguente: analizz
 
 In generale, focalizzandosi su una traccia andremo a tagliare il sotto-poligono che la contiene finché uno dei suoi estremi interseca un lato del sotto-poligono stesso. Non appena l'intersezione della traccia coi lati del poligono non è più contenuta nella traccia stessa, sarà operata l'ultima suddivisione prima di passare alla traccia successiva.\\
 
-L'approccio che abbiamo utilizzato per implementare la determinazione dei sotto-poligoni è iterativo e può essere sintetizzato come segue.  \\ [2mm] Per ogni frattura $j=1,\dots,N$, consideriamo la prima traccia che le appartiene che avrà la coppia di vertici $\{\B{T_{1}},\B{T_{2}}\}$, quindi selezioniamo la prima intersezione che avviene tra la retta contente la traccia ed uno dei lati della frattura, questo sarà il punto iniziale della suddivisione dei sotto-poligoni. 
+L'approccio che abbiamo utilizzato per implementare la determinazione dei sotto-poligoni è iterativo e può essere sintetizzato come segue.  \\ [2mm] Per ogni frattura $j=1,\dots,N$, consideriamo la prima traccia che le appartiene che avrà la coppia di vertici $\{\B{T_{1}},\B{T_{2}}\}$, quindi selezioniamo la prima intersezione che avviene tra la retta contente la traccia ed uno dei lati della frattura individuato dalla coppia $\{\B{P_{j}},\B{P_{j+1}}\}$, questo sarà il punto iniziale della suddivisione dei sotto-poligoni. Svolgiamo il sistema per determinare l'intersezione tra la traccia e un lato.
 
 \begin{equation}
 \begin{cases}
@@ -149,26 +149,26 @@ L'approccio che abbiamo utilizzato per implementare la determinazione dei sotto-
 \label{eq:intersezioni}
 \end{equation}
 
-Ripetiamo, quindi, la risoluzione del sistema \eqref{eq:intersezioni} finché non abbiamo trovato un parametro $t \in [0,1]$ che equivale alla condizione di stare sul lato della frattura. \\
+Potrebbe succedere che il sistema non abbia soluzione, in tal caso le rette sono parallele. Altrimenti in caso di sistema determinato otterremo la coppia $( s,t )$. Se $t \in [0,1]$ otteniamo effettivamente che il punto di intersezione giace sul lato, inoltre se $s \in [0,1]$ allora il punto si troverà sulla traccia stessa mentre se non è compreso in questo intervallo sceglieremo tra tutti i valori di $s$ ottenuti quello più vicino all'intervallo $[0,1]$. \\
 
 Adesso dividiamo il lato che contiene il punto di intersezione in due sotto-lati, questi verranno memorizzati con codice identificativo e vertici nella struttura $Polygonal \ mesh$. Inoltre, ad ogni lato creato verranno assegnati: 
 \begin{enumerate} 
-\item un booleano per indicare se è attivo ($true$), cioè fa parte della struttura corrente, oppure se non lo è ($false$);
-\item i codici identificativi delle fratture adiacenti al lato, al massimo due.
+\item Un booleano per indicare se è attivo ($true$), cioè fa parte della struttura corrente, oppure se non lo è ($false$);
+\item I codici identificativi delle fratture adiacenti al lato, al massimo due.
 \end{enumerate}
 
 Quindi il lato diviso assumerà il booleano $false$ poiché esce dalla struttura corrente, mentre i due sotto-lati creati acquisiscono attivazione e l'adiacenza della frattura che stiamo analizzando. \\[2mm]
-A questo punto è necessario creare due nuove celle 2D che rappresenteranno i due sotto-poligoni e assegnare alle celle i rispettivi lati creati. 
+A questo punto è necessario creare due nuove celle 2D, che rappresenteranno i due sotto-poligoni, e assegnare alle celle i rispettivi lati creati. 
 
-Per assegnare i restanti lati del poligono originale nelle corrette celle 2D create, è opportuno memorizzare dapprima il codice identificativo del lato successivo al lato tagliato,  in questo modo sarà possibile ciclare in senso antiorario sui lati del poligono originale. 
-Quindi un lato sarà inserito: 
+Per assegnare i lati del poligono originale nelle corrette celle 2D create, è opportuno memorizzare dapprima il codice identificativo del lato successivo al lato tagliato, che chiameremo $idInitialPoint$,  in questo modo sarà possibile percorrere in senso antiorario i lati del poligono originale a partire da $idInitialPoint$. \\ [1.5mm]
+Quindi un nuovo lato sarà inserito: 
 \begin{enumerate} 
-\item Nel primo sotto-poligono se il lato non contiene l'intersezione con l'altro estremo della traccia,;
-\item Nel secondo sotto-poligono se il punto di intersezione è già stato superato.
+\item Nel primo sotto-poligono se il lato non contiene l'intersezione con il secondo estremo della traccia;
+\item Nel secondo sotto-poligono se il punto di intersezione con il secondo estremo della traccia è già stato superato.
 \end{enumerate}
-Per verificare la condizione di intersezione ripetiamo per tutti i lati il sistema \eqref{eq:intersezioni}. Quindi se esiste l'intersezione e il parametro $t \in [0,1]$ allora l'altro estremo della traccia sta sul lato considerato e da quel punto in avanti dovremo memorizzare i dati nel secondo sotto-poligono. Contemporaneamente alla memorizzazione dei lati, allo stesso modo si procede con quella dei vertici. Per ultimo aggiungiamo ad entrambi i sotto-poligoni il lato che divide li divide.
+Per verificare la condizione di intersezione ripetiamo per tutti i lati il sistema \eqref{eq:intersezioni}. Quindi se esiste l'intersezione e il parametro $t \in [0,1]$ allora il secondo estremo della traccia sta sul lato considerato e da quel punto in avanti dovremo memorizzare i dati nel secondo sotto-poligono. Il passaggio da un poligono all'altro può essere segnalato da un booleano che si attiva non appena troviamo l'intersezione. Contemporaneamente alla memorizzazione dei lati, allo stesso modo si procede con quella dei vertici. Per ultimo aggiungiamo ad entrambi i sotto-poligoni il lato che divide li divide.
 \\ [2mm]
-Con l'accortezza di analizzare tutti i poligoni adiacenti al lato di prima intersezione, questo procedimento viene iterato per ogni traccia del poligono originale finché il punto di intersezione della traccia con i lati del poligono ha l'ascissa curvilinea $s \in [0,1]$ sulla retta che la contiene. Non appena troveremo un valore al di fuori di questo intervallo, concluderemo la divisione del poligono in cui è presente la traccia e termineremo il taglio per poi passare alla traccia successiva.
+Con l'accortezza di analizzare tutti i poligoni adiacenti al lato di prima intersezione, questo procedimento viene iterato per ogni traccia del poligono originale finché il punto di intersezione della traccia con i lati del poligono, ottenuto mediante il sistema \eqref{eq:intersezioni}, ha l'ascissa curvilinea $s \in [0,1]$. Non appena troveremo un valore al di fuori di questo intervallo, concluderemo la divisione del poligono in cui è presente la traccia e passeremo alla traccia successiva, fino ad esaurirle.
 
 
 
