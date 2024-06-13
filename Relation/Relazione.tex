@@ -130,14 +130,14 @@ Attraverso questo algoritmo abbiamo trovato i vertici delle tracce, il loro valo
 
 \section{Determinazione dei sotto-poligoni generati per ogni frattura}
 Per ogni frattura $j=1,\dots,N$, consideriamo inizialmente tutte le tracce passanti per lo stesso e, attraverso i valori di $t$ trovati nelle sezioni precedenti (ossia i valori scartati dopo l'intersezione dei due intervalli), identifichiamo i vertici dei nuovi sotto-poligoni sempre allo stesso modo, ossia:$$\B{OP}=\B{OQ}+t^*\B{v},$$ dove $t^*$ è il valore del parametro reale corrispondente a un punto che giace su un lato della frattura e sulla retta contenente la traccia. Per ordinare i punti in senso antiorario dobbiamo ricordare che l'intersezione tra la retta $r_j$ e la retta $r$ è avvenuta prendendo i vertici $\B{P}_j$ e $\B{P}_{j+1}$, che sono già ordinati in senso antiorario. Nel momento in cui $r$ ed $r_j$ risultano in un'intersezione per cui effettivamente il punto $\B{Q}$ giace sul lato (e, quindi, il valore associato $s\in[0,1]$), scartiamo tutti i vertici $\B{P}_{j+1},\dots,\B{P}_{j+k}$, dove $\B{P}_{j+k}$ è il vertice del lato $\B{P}_{j+k}\B{P}_{j+k+1}$ per cui avviene che l'altra intersezione con la retta $r$ è ammissibile. Il nuovo sotto-poligono generato avrà gli stessi vertici della frattura originale, esclusi i vertici $\B{P}_{j+1},\dots,\B{P}_{j+k}$, che verranno sostituiti dai due punti della retta contenente la traccia giacenti sui lati del poligono. 
-
+\\ [2mm]
 L'idea alla base della determinazione dei sotto-poligoni è la seguente: analizzando una frattura alla volta, esaminiamo la prima traccia per ordine di lunghezza e valore di Tips, dividiamo il poligono originale in due sotto-poligoni e passiamo alla seconda traccia. A questo punto si possono presentare due casi:
 \begin{enumerate} [(i)]
-\item  se la traccia è contenuta in uno solo dei sotto-poligoni, allora procederemo a tagliarlo in ulteriori due sotto-poligoni;
+\item  se la traccia è contenuta in uno solo dei sotto-poligoni, allora procederemo al taglio del sotto-poligono in questione;;
 \item altrimenti entrambi i sotto-poligoni dovranno essere divisi ulteriormente;
 \end{enumerate}
 
-In generale, focalizzandosi su una traccia andremo a tagliare il sotto-poligono che la contiene finché uno dei suoi estremi non interseca un lato del sotto-poligono stesso. \\
+In generale, focalizzandosi su una traccia andremo a tagliare il sotto-poligono che la contiene finché uno dei suoi estremi interseca un lato del sotto-poligono stesso. Non appena l'intersezione della traccia coi lati del poligono non è più contenuta nella traccia stessa, sarà operata l'ultima suddivisione prima di passare alla traccia successiva.\\
 
 L'approccio che abbiamo utilizzato per implementare la determinazione dei sotto-poligoni è iterativo e può essere sintetizzato come segue.  \\ [2mm] Per ogni frattura $j=1,\dots,N$, consideriamo la prima traccia che le appartiene che avrà la coppia di vertici $\{\B{T_{1}},\B{T_{2}}\}$, quindi selezioniamo la prima intersezione che avviene tra la retta contente la traccia ed uno dei lati della frattura, questo sarà il punto iniziale della suddivisione dei sotto-poligoni. 
 
@@ -149,21 +149,26 @@ L'approccio che abbiamo utilizzato per implementare la determinazione dei sotto-
 \label{eq:intersezioni}
 \end{equation}
 
-Ripetiamo quindi la risoluzione del sistema finché non abbiamo trovato il parametro $t \in [0,1]$ che equivale alla condizione di stare sul lato della frattura. \\
+Ripetiamo, quindi, la risoluzione del sistema \eqref{eq:intersezioni} finché non abbiamo trovato un parametro $t \in [0,1]$ che equivale alla condizione di stare sul lato della frattura. \\
 
-Adesso dividiamo il lato contenente il punto di intersezione in due sotto-lati, questi verranno memorizzati con codice identificativo e vertici nella struttura $Polygonal \ mesh$. Inoltre, ad ogni lato creato verranno assegnati: 
+Adesso dividiamo il lato che contiene il punto di intersezione in due sotto-lati, questi verranno memorizzati con codice identificativo e vertici nella struttura $Polygonal \ mesh$. Inoltre, ad ogni lato creato verranno assegnati: 
 \begin{enumerate} 
 \item un booleano per indicare se è attivo ($true$), cioè fa parte della struttura corrente, oppure se non lo è ($false$);
 \item i codici identificativi delle fratture adiacenti al lato, al massimo due.
 \end{enumerate}
 
-Quindi il lato diviso assumerà il booleano $false$ poiché esce dalla struttura corrente, mentre i due sotto-lati creati acquisiscono attivazione e l'adiacenza della frattura che stiamo analizzando. \\
+Quindi il lato diviso assumerà il booleano $false$ poiché esce dalla struttura corrente, mentre i due sotto-lati creati acquisiscono attivazione e l'adiacenza della frattura che stiamo analizzando. \\[2mm]
 A questo punto è necessario creare due nuove celle 2D che rappresenteranno i due sotto-poligoni e assegnare alle celle i rispettivi lati creati. 
 
-Per assegnare i restanti lati del poligono originale nelle corrette celle 2D create, è opportuno memorizzare dapprima il codice identificativo del lato successivo al lato tagliato così da poter ciclare in senso antiorario sui lati del poligono originale. 
-Quindi un lato sarà inserito nel primo sotto-poligono se non ha intersezione con la traccia, da questo punto di intersezione i lati dovranno essere inseriti nell'altro sotto-poligono fino ad esaurimento. Per verificare la condizione di intersezione ripetiamo per tutti i lati il sistema \eqref{eq:intersezioni}. Quindi se esiste l'intersezione e il parametro $t \in [0,1]$ allora l'altro estremo della traccia sta sul lato considerato e da quel punto in avanti dovremo memorizzare i dati nel secondo sotto-poligono. Contemporaneamente alla memorizzazione dei lati, allo stesso modo si procede con quella dei vertici. Per ultimo aggiungiamo ad entrambi i sotto-poligoni il lato che divide li divide.
-\\[2mm]
-Questo procedimento lo iteriamo per ogni traccia del poligono originale con l'accortezza di analizzare tutti i poligoni adiacenti al lato di prima intersezione finché il punto di intersezione della traccia con i lati ha la sua ascissa curvilinea $s \in [0,1]$ sulla retta che la contiene. Non appena troveremo un valore al di fuori di questo intervallo, concluderemo la divisione del poligono in cui è presente la traccia e termineremo il taglio per la traccia in questione per passare alla successiva.
+Per assegnare i restanti lati del poligono originale nelle corrette celle 2D create, è opportuno memorizzare dapprima il codice identificativo del lato successivo al lato tagliato,  in questo modo sarà possibile ciclare in senso antiorario sui lati del poligono originale. 
+Quindi un lato sarà inserito: 
+\begin{enumerate} 
+\item Nel primo sotto-poligono se il lato non contiene l'intersezione con l'altro estremo della traccia,;
+\item Nel secondo sotto-poligono se il punto di intersezione è già stato superato.
+\end{enumerate}
+Per verificare la condizione di intersezione ripetiamo per tutti i lati il sistema \eqref{eq:intersezioni}. Quindi se esiste l'intersezione e il parametro $t \in [0,1]$ allora l'altro estremo della traccia sta sul lato considerato e da quel punto in avanti dovremo memorizzare i dati nel secondo sotto-poligono. Contemporaneamente alla memorizzazione dei lati, allo stesso modo si procede con quella dei vertici. Per ultimo aggiungiamo ad entrambi i sotto-poligoni il lato che divide li divide.
+\\ [2mm]
+Con l'accortezza di analizzare tutti i poligoni adiacenti al lato di prima intersezione, questo procedimento viene iterato per ogni traccia del poligono originale finché il punto di intersezione della traccia con i lati del poligono ha l'ascissa curvilinea $s \in [0,1]$ sulla retta che la contiene. Non appena troveremo un valore al di fuori di questo intervallo, concluderemo la divisione del poligono in cui è presente la traccia e termineremo il taglio per poi passare alla traccia successiva.
 
 
 
