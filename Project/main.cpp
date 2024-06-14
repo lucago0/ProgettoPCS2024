@@ -172,15 +172,13 @@ int main()
                     if (!almostEqual(test[0],0,tol) || !almostEqual(test[1],0,tol) || !almostEqual(test[2],0,tol)){
                         VectorXd q = linesIntersection(edge,trace); //Q, t, s
                         double t = q[3];
-                        s = q[4];
+                        double s = q[4];
                         if ((t>=(0-tol)) && (t<=(1+tol))){
                             coordinatesIntersectionPoint = q.head(3);
                             idIntersectionEdge = idCell1D;
-                            if(almostEqual(s,0,tol)|| almostEqual(s,1,tol)){
-                                out = true;
-                            }
-                            else if (!(s>=(0-tol) && s<=(1+tol))){
-                                out = true;
+                            if ((s>=(0-tol)) && (s<=(1+tol))){
+                                found = true;
+                                break;
                             }
                             else if (s < (s1+tol) && s > (1-tol)){
                                 s1 = s;
@@ -290,10 +288,7 @@ int main()
                         mesh.isOn2D[actualNeigh] = false;
                         mesh.isOn2D.push_back(true); mesh.isOn2D.push_back(true);
 
-                        if(almostEqual(s,0,tol)|| almostEqual(s,1,tol)){
-                            out = true;
-                        }
-                        else if (!(s>=(0-tol) && s<=(1+tol))){
+                        if(almostEqual(s,0,tol) || almostEqual(s,1,tol) || (!(s>=(0-tol) && s<=(1+tol)))){
                             out = true;
                         }
                         else {
@@ -399,5 +394,3 @@ int main()
         return 0;
     }
 }
-
-
