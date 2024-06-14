@@ -90,7 +90,7 @@ void outputFile(Traces& traces, Fractures& fractures)
 
     for(unsigned int i = 0; i < fractures.numberOfFractures; i++)
     {
-        ofs2 << "# fracturesactureId; NumTraces" << endl;
+        ofs2 << "# FractureId; NumTraces" << endl;
         ofs2 << i << ";" << fractures.numberOfTraces[i] << endl;
         ofs2 << "# TraceId; Tips; Length" << endl;
         for (const auto& elem : fractures.traces[i]) {
@@ -197,9 +197,9 @@ VectorXd linesIntersection(const line& r,const line& rj){  //primi 3 punto di in
     double t;
     double s;
     Matrix<double,3,2> A;
-    A << r.direction[0], rj.direction[0],
-        r.direction[1], rj.direction[1],
-        r.direction[2], rj.direction[2];
+    A << r.direction[0], -rj.direction[0],
+        r.direction[1], -rj.direction[1],
+        r.direction[2], -rj.direction[2];
 
     Vector3d b = {rj.point[0] - r.point[0],
                   rj.point[1] - r.point[1],
@@ -207,7 +207,7 @@ VectorXd linesIntersection(const line& r,const line& rj){  //primi 3 punto di in
 
     Vector2d k = A.colPivHouseholderQr().solve(b); //non è quadrata la matrice
     t = k[0];
-    s = -k[1]; //da capire perchè ci va il -
+    s = k[1];
     q << rj.point[0] + rj.direction[0]*s,
         rj.point[1] + rj.direction[1]*s,
         rj.point[2] + rj.direction[2]*s,

@@ -8,7 +8,7 @@ using namespace fracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR362_data.txt";
+    string filepath = "./FR10_data.txt";
     if(!importFractures(filepath, fractures))
     {
         return 1;
@@ -133,10 +133,9 @@ int main()
         unsigned int numberOfVertices = fractures.vertices[idFrac].cols();
         mesh.verticesCell2Ds.resize(mesh.numberCell2Ds+1);
         mesh.edgesCell2Ds.resize(mesh.numberCell2Ds+1);
-        mesh.numberCell2Ds++;
         for(unsigned int v = 0; v < numberOfVertices; v++){
             mesh.coordinateCell0Ds.push_back(fractures.vertices[idFrac].col(v));
-            mesh.coordinateCell1Ds.push_back({mesh.numberCell0Ds+v,(mesh.numberCell0Ds+v+1)%numberOfVertices});
+            mesh.verticesCell1Ds.push_back({mesh.numberCell0Ds+v,(mesh.numberCell0Ds+v+1)%numberOfVertices});
             mesh.isOn1D.push_back(true);
             mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size()+1);
             mesh.neighCell1Ds[mesh.numberCell1Ds+v].push_back(mesh.numberCell2Ds);
@@ -145,16 +144,25 @@ int main()
         }
         mesh.numberCell0Ds += numberOfVertices;
         mesh.numberCell1Ds += numberOfVertices;
+        mesh.numberCell2Ds++;
         mesh.isOn2D.push_back(true);
 
         unsigned int numberOfCell2DsNow = mesh.numberCell2Ds;
 
-        for(unsigned int idTrace : fractures.traces[idFrac]){
+        for(unsigned int w = 0; w < fractures.traces[idFrac].size(); w++){
+            unsigned int idTrace = get<0>(fractures.traces[idFrac][w]);
             bool found = false;
             line trace;
             trace.point = traces.vertices[idTrace].col(0);
             trace.direction = traces.vertices[idTrace].col(1) - trace.point;
-            double s1 = -std::numeric_limits<double>::max;
+            double s1 = std::numeric_limits<double>::max();
+
+            Vector3d coordinatesIntersectionPoint;
+            unsigned int idIntersectionEdge;
+            unsigned int idInitialCell;
+            unsigned int otherNeigh;
+            double s;
+
             for (unsigned int idCell2D = numberOfCell2DsNow-1; idCell2D < mesh.numberCell2Ds; idCell2D++){
                 for (unsigned int idCell1D : mesh.edgesCell2Ds[idCell2D]){
                     line edge;
@@ -164,23 +172,25 @@ int main()
                     if (!almostEqual(test[0],0,tol) || !almostEqual(test[1],0,tol) || !almostEqual(test[2],0,tol)){
                         VectorXd q = linesIntersection(edge,trace); //Q, t, s
                         double t = q[3];
-                        double s = q[4];
+                        s = q[4];
                         if ((t>=(0-tol)) && (t<=(1+tol))){
-                            Vector3d coordinatesIntersectionPoint = q.head(3);
-                            unsigned int idIntersectionEdge = idCell1D;
-                            if ((s>=(0-tol)) && (s<=(1+tol))){
-                                found = true;
-                                break;
+                            coordinatesIntersectionPoint = q.head(3);
+                            idIntersectionEdge = idCell1D;
+                            if(almostEqual(s,0,tol)|| almostEqual(s,1,tol)){
+                                out = true;
+                            }
+                            else if (!(s>=(0-tol) && s<=(1+tol))){
+                                out = true;
                             }
                             else if (s < (s1+tol) && s > (1-tol)){
                                 s1 = s;
-                                unsigned int idInitialCell = idCell2D;
+                                idInitialCell = idCell2D;
                             }
                         }
                     }
-                }
-                if (found){
-                    break;
+                    if (found){
+                        break;
+                    }
                 }
             }
             mesh.numberCell0Ds++;
@@ -192,13 +202,13 @@ int main()
             mesh.verticesCell1Ds.push_back({idIntersectionPoint,mesh.verticesCell1Ds[idIntersectionEdge][1]});
             mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size()+1);
             mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds);
-            mesh.isOn1D[idCell1D].push_back(true);
+            mesh.isOn1D.push_back(true);
 
             unsigned int idInitialEdge1 = ++mesh.numberCell1Ds;
             mesh.verticesCell1Ds.push_back({mesh.verticesCell1Ds[idIntersectionEdge][0],idIntersectionPoint});
             mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size()+1);
             mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds+1);
-            mesh.isOn1D[idCell1D].push_back(true);
+            mesh.isOn1D.push_back(true);
 
             if (found){
                 for (unsigned int neigh : mesh.neighCell1Ds[idIntersectionEdge]){
@@ -206,7 +216,7 @@ int main()
                     bool out = false;
                     while (!out){
                         unsigned int polygon = 0;
-                        // trovo la posizione di idInitialEdge in mesh.edgesCell2Ds[actualNeigh]
+                        //trovo la posizione di idInitialEdge in mesh.edgesCell2Ds[actualNeigh]
                         unsigned int indexOfInitialEdge = 0;
                         for (unsigned int j = 0; j < mesh.edgesCell2Ds[actualNeigh].size(); j++){
                             if (mesh.edgesCell2Ds[actualNeigh][j] == idIntersectionEdge){
@@ -218,7 +228,7 @@ int main()
                         mesh.verticesCell2Ds.resize(mesh.verticesCell2Ds.size()+2);
                         mesh.edgesCell2Ds.resize(mesh.edgesCell2Ds.size()+2);
 
-                        // Inserisco InitiaEdge1 e InitialEdge0 nelle celle 2D
+                        //Inserisco InitiaEdge1 e InitialEdge0 nelle celle 2D
                         mesh.verticesCell2Ds[mesh.numberCell2Ds].push_back(idIntersectionPoint);
                         mesh.edgesCell2Ds[mesh.numberCell2Ds].push_back(idInitialEdge0);
                         mesh.verticesCell2Ds[mesh.numberCell2Ds+1].push_back(idIntersectionPoint);
@@ -231,16 +241,16 @@ int main()
                             edge.direction = mesh.coordinateCell0Ds[mesh.verticesCell1Ds[idCell1D][1]] - edge.point;
                             Vector3d test = (trace.direction).cross(edge.direction);
                             if (!almostEqual(test[0],0,tol) || !almostEqual(test[1],0,tol) || !almostEqual(test[2],0,tol)){
-                                VectorXd q = linesIntersection(trace,edge);
+                                VectorXd q = linesIntersection(edge,trace); //controllare ordine qui
                                 double t = q[3];
                                 if (t>=(0-tol) && t<=(1+tol)){
-                                    double s = q[4];
+                                    s = q[4];
 
                                     idIntersectionPoint = ++mesh.numberCell0Ds;
                                     mesh.coordinateCell0Ds.push_back(q.head(3));
 
                                     idIntersectionEdge = idCell1D;
-                                    mesh.isOn[idCell1D] = false;
+                                    mesh.isOn1D[idCell1D] = false;
 
                                     idInitialEdge0 = ++mesh.numberCell1Ds;
                                     mesh.verticesCell1Ds.push_back({mesh.verticesCell1Ds[idCell1D][0],mesh.numberCell0Ds});
@@ -258,9 +268,9 @@ int main()
                                     mesh.neighCell1Ds[idInitialEdge1].push_back(mesh.numberCell2Ds+1);
                                     mesh.isOn1D.push_back(true);
 
-                                    mesh.verticesCell2Ds[mesh.numberCell2Ds+1].push_front(mesh.numberCell0Ds);
-                                    mesh.verticesCell2Ds[mesh.numberCell2Ds+1].push_front(mesh.verticesCell1Ds[idCell1D][1]);
-                                    mesh.edgesCell2Ds[mesh.numberCell2Ds+1].push_front(mesh.numberCell1Ds);
+                                    mesh.verticesCell2Ds[mesh.numberCell2Ds+1].insert(mesh.verticesCell2Ds[mesh.numberCell2Ds+1].begin(),mesh.numberCell0Ds);
+                                    mesh.verticesCell2Ds[mesh.numberCell2Ds+1].insert(mesh.verticesCell2Ds[mesh.numberCell2Ds+1].begin(),mesh.verticesCell1Ds[idCell1D][1]);
+                                    mesh.edgesCell2Ds[mesh.numberCell2Ds+1].insert(mesh.edgesCell2Ds[mesh.numberCell2Ds+1].begin(),mesh.numberCell1Ds);
                                 }
                                 else {
                                     mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.verticesCell1Ds[idCell1D][0]);
@@ -268,18 +278,22 @@ int main()
                                 }
                             }
                         }
-                        // Inserisco EF
+                        //Inserisco EF
                         mesh.numberCell1Ds++;
                         mesh.verticesCell1Ds.push_back({idIntersectionPoint,mesh.numberCell0Ds});
                         mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds);
                         mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds+1);
                         mesh.isOn1D.push_back(true);
-                        mesh.edgesCell2Ds[mesh.numberCell2Ds].push_front(mesh.numberCell1Ds);
+                        mesh.edgesCell2Ds[mesh.numberCell2Ds].insert(mesh.edgesCell2Ds[mesh.numberCell2Ds].begin(),mesh.numberCell1Ds);
                         mesh.edgesCell2Ds[mesh.numberCell2Ds+1].push_back(mesh.numberCell1Ds);
                         mesh.numberCell2Ds += 2;
                         mesh.isOn2D[actualNeigh] = false;
                         mesh.isOn2D.push_back(true); mesh.isOn2D.push_back(true);
-                        if (!(s>=(0-tol) && s<=(1+tol))){
+
+                        if(almostEqual(s,0,tol)|| almostEqual(s,1,tol)){
+                            out = true;
+                        }
+                        else if (!(s>=(0-tol) && s<=(1+tol))){
                             out = true;
                         }
                         else {
@@ -294,21 +308,21 @@ int main()
             }
             else {
                 for (unsigned int x : mesh.neighCell1Ds[idIntersectionEdge]){
-                    if (initialCell2D != x){
-                        unsigned int otherNeigh = x;
+                    if (idInitialCell != x){
+                        otherNeigh = x;
                     }
                 }
                 for (unsigned int i = 0; i < mesh.edgesCell2Ds[otherNeigh].size(); i++){
                     if (!mesh.isOn1D[mesh.edgesCell2Ds[otherNeigh][i]]){
                         mesh.verticesCell2Ds[otherNeigh].insert(mesh.verticesCell2Ds[otherNeigh].begin() + i, idIntersectionPoint);
-                        mesh.edgesCell2Ds[otherNeight].erase(mesh.verticesCell2Ds[otherNeigh].begin() + i);
+                        mesh.edgesCell2Ds[otherNeigh].erase(mesh.verticesCell2Ds[otherNeigh].begin() + i);
                         mesh.edgesCell2Ds[otherNeigh].insert(mesh.verticesCell2Ds[otherNeigh].begin() + i, idInitialEdge0);
                         mesh.edgesCell2Ds[otherNeigh].insert(mesh.verticesCell2Ds[otherNeigh].begin() + i+1, idInitialEdge1);
                     }
                 }
 
                 unsigned int polygon = 0;
-                // trovo la posizione di idInitialEdge in mesh.edgesCell2Ds[idInitialCell]
+                //trovo la posizione di idInitialEdge in mesh.edgesCell2Ds[idInitialCell]
                 unsigned int indexOfInitialEdge = 0;
                 for (unsigned int j = 0; j < mesh.edgesCell2Ds[idInitialCell].size(); j++){
                     if (mesh.edgesCell2Ds[idInitialCell][j] == idIntersectionEdge){
@@ -320,7 +334,7 @@ int main()
                 mesh.verticesCell2Ds.resize(mesh.verticesCell2Ds.size()+2);
                 mesh.edgesCell2Ds.resize(mesh.edgesCell2Ds.size()+2);
 
-                // Inserisco InitiaEdge1 e InitialEdge0 nelle celle 2D
+                //Inserisco InitiaEdge1 e InitialEdge0 nelle celle 2D
                 mesh.verticesCell2Ds[mesh.numberCell2Ds].push_back(idIntersectionPoint);
                 mesh.edgesCell2Ds[mesh.numberCell2Ds].push_back(idInitialEdge0);
                 mesh.verticesCell2Ds[mesh.numberCell2Ds+1].push_back(idIntersectionPoint);
@@ -336,13 +350,13 @@ int main()
                         VectorXd q = linesIntersection(trace,edge);
                         double t = q[3];
                         if (t>=(0-tol) && t<=(1+tol)){
-                            double s = q[4];
+                            s = q[4];
 
                             idIntersectionPoint = ++mesh.numberCell0Ds;
                             mesh.coordinateCell0Ds.push_back(q.head(3));
 
                             idIntersectionEdge = idCell1D;
-                            mesh.isOn[idCell1D] = false;
+                            mesh.isOn1D[idCell1D] = false;
 
                             idInitialEdge0 = ++mesh.numberCell1Ds;
                             mesh.verticesCell1Ds.push_back({mesh.verticesCell1Ds[idCell1D][0],mesh.numberCell0Ds});
@@ -360,9 +374,9 @@ int main()
                             mesh.neighCell1Ds[idInitialEdge1].push_back(mesh.numberCell2Ds+1);
                             mesh.isOn1D.push_back(true);
 
-                            mesh.verticesCell2Ds[mesh.numberCell2Ds+1].push_front(mesh.numberCell0Ds);
-                            mesh.verticesCell2Ds[mesh.numberCell2Ds+1].push_front(mesh.verticesCell1Ds[idCell1D][1]);
-                            mesh.edgesCell2Ds[mesh.numberCell2Ds+1].push_front(mesh.numberCell1Ds);
+                            mesh.verticesCell2Ds[mesh.numberCell2Ds+1].insert(mesh.verticesCell2Ds[mesh.numberCell2Ds+1].begin(),mesh.numberCell0Ds);
+                            mesh.verticesCell2Ds[mesh.numberCell2Ds+1].insert(mesh.verticesCell2Ds[mesh.numberCell2Ds+1].begin(),mesh.verticesCell1Ds[idCell1D][1]);
+                            mesh.edgesCell2Ds[mesh.numberCell2Ds+1].insert(mesh.edgesCell2Ds[mesh.numberCell2Ds+1].begin(),mesh.numberCell1Ds);
                         }
                         else {
                             mesh.verticesCell2Ds[mesh.numberCell2Ds+polygon].push_back(mesh.verticesCell1Ds[idCell1D][0]);
@@ -375,7 +389,7 @@ int main()
                 mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds);
                 mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds+1);
                 mesh.isOn1D.push_back(true);
-                mesh.edgesCell2Ds[mesh.numberCell2Ds].push_front(mesh.numberCell1Ds);
+                mesh.edgesCell2Ds[mesh.numberCell2Ds].insert(mesh.edgesCell2Ds[mesh.numberCell2Ds].begin(),mesh.numberCell1Ds);
                 mesh.edgesCell2Ds[mesh.numberCell2Ds+1].push_back(mesh.numberCell1Ds);
                 mesh.numberCell2Ds += 2;
                 mesh.isOn2D[idInitialCell] = false;
@@ -384,3 +398,6 @@ int main()
         }
         return 0;
     }
+}
+
+
