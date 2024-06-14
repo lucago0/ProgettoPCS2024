@@ -172,8 +172,8 @@ int main()
                     if (!almostEqual(test[0],0,tol) || !almostEqual(test[1],0,tol) || !almostEqual(test[2],0,tol)){
                         VectorXd q = linesIntersection(edge,trace); //Q, t, s
                         double t = q[3];
-                        double s = q[4];
-                        if ((t>=(0-tol)) && (t<=(1+tol))){
+                        s = q[4];
+                        if ((t>=(0-tol)) && (t<=(1+tol))){ //se sono sul lato
                             coordinatesIntersectionPoint = q.head(3);
                             idIntersectionEdge = idCell1D;
                             if ((s>=(0-tol)) && (s<=(1+tol))){
@@ -196,16 +196,19 @@ int main()
             idIntersectionPoint = mesh.numberCell0Ds;
             mesh.isOn1D[idIntersectionEdge] = false;
 
-            unsigned int idInitialEdge0 = ++mesh.numberCell1Ds;
+            unsigned int idInitialEdge0 = ++mesh.numberCell1Ds; //controllare questo
+            //aggiungo EB con Id = 5 al primo giro
             mesh.verticesCell1Ds.push_back({idIntersectionPoint,mesh.verticesCell1Ds[idIntersectionEdge][1]});
-            mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size()+1);
-            mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds);
+            mesh.neighCell1Ds.resize(mesh.numberCell1Ds); // Ridimensiona correttamente il vettore
+            mesh.neighCell1Ds[mesh.numberCell1Ds-1].push_back(mesh.numberCell2Ds);
+
             mesh.isOn1D.push_back(true);
 
             unsigned int idInitialEdge1 = ++mesh.numberCell1Ds;
+            //aggiungo AE con ID = 6 al primo giro
             mesh.verticesCell1Ds.push_back({mesh.verticesCell1Ds[idIntersectionEdge][0],idIntersectionPoint});
-            mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size()+1);
-            mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds+1);
+            mesh.neighCell1Ds.resize(mesh.numberCell1Ds);
+            mesh.neighCell1Ds[mesh.numberCell1Ds-1].push_back(mesh.numberCell2Ds+1);
             mesh.isOn1D.push_back(true);
 
             if (found){
