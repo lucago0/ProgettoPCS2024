@@ -166,17 +166,32 @@ line planesIntersection(const Vector4d &coeff1, const Vector4d &coeff2, const do
 
     output.direction = v2.cross(v1);
 
-    if(!almostEqual(output.direction[2],0,tol))
-    {
-        Matrix<double,2,2> M;
-        M << v1[0], v1[1],
-            v2[0],v2[1];
-        Vector2d b = {-coeff1[3],-coeff2[3]};
-        Vector2d P = M.colPivHouseholderQr().solve(b);
-        output.point[0] = P[0];
-        output.point[1] = P[1];
+    Matrix<double,2,3> M;
+    M << v1[0],v1[1],v1[2],
+    v2[0],v2[1],v2[2];
+    Vector2d b = {-coeff1[3],-coeff2[3]};
+
+    bool colZero = false;
+    bool flag = false;
+    for (unsigned int j = 0; j < 3; j++){
+        if(almostEqual(M.col(j)[0],0,tol) && almostEqual(M.col(j)[1],0,tol)){
+            colZero = true;
+            Matrix2d A(M.rows(), M.cols() - 1);
+            A << M.block(0, 0, M.rows(), j),
+                M.block(0, j + 1, M.rows(), M.cols() - j - 1);
+            Vector2d P = A.colPivHouseholderQr().solve(b);
+            for (unsigned int k = 0; k < 3; k++){
+                if (k != j){
+                    output.point[k] = P[k-flag];
+                }
+                else{
+                    output.point[k] = 0;
+                    flag = 1;
+                }
+            }
+        }
     }
-    else
+    if(!colZero)
     {
         Matrix<double,2,2> M;
         M << v1[0], v1[2],
@@ -186,7 +201,6 @@ line planesIntersection(const Vector4d &coeff1, const Vector4d &coeff2, const do
         output.point[0] = P[0];
         output.point[2] = P[1];
     }
-
     return output;
 }
 
