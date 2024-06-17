@@ -8,7 +8,7 @@ using namespace fracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR3_data.txt";
+    string filepath = "./FR200_data.txt";
     if(!importFractures(filepath, fractures))
     {
         return 1;
