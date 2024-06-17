@@ -8,7 +8,7 @@ using namespace fracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR50_data.txt";
+    string filepath = "./FR200_data.txt";
     if(!importFractures(filepath, fractures))
     {
         return 1;
@@ -129,6 +129,8 @@ int main()
     Vector3d coordinatesIntersectionPoint = {0,0,0};
     Vector3d test = {0,0,0};
     VectorXd q;
+    line trace;
+    line edge;
     unsigned int idIntersectionEdge = 0;
     unsigned int idNewIntersectionEdge = 0;
     unsigned int idIntersectionPoint = 0;
@@ -155,7 +157,6 @@ int main()
     unsigned int idCell0D = 0;
     unsigned int idCell1D = 0;
     bool out = false;
-    bool pass = false;
     bool found = false;
     double s = 0;
     double t = 0;
@@ -166,11 +167,11 @@ int main()
         numberOfVertices = fractures.vertices[idFrac].cols();
         mesh.verticesCell2Ds.resize(mesh.numberCell2Ds+1);
         mesh.edgesCell2Ds.resize(mesh.numberCell2Ds+1);
+        mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size() + numberOfVertices);
         for(unsigned int v = 0; v < numberOfVertices; v++){ //aggiungo la frattura su cui sono alla mesh
             mesh.coordinateCell0Ds.push_back(fractures.vertices[idFrac].col(v));
             mesh.verticesCell1Ds.push_back({mesh.numberCell0Ds+v,(mesh.numberCell0Ds+v+1)%numberOfVertices});
             mesh.isOn1D.push_back(true);
-            mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size()+1);
             mesh.neighCell1Ds[mesh.numberCell1Ds+v].push_back(mesh.numberCell2Ds);
             mesh.verticesCell2Ds[mesh.numberCell2Ds].push_back(mesh.numberCell0Ds+v);
             mesh.edgesCell2Ds[mesh.numberCell2Ds].push_back(mesh.numberCell1Ds+v);
@@ -185,7 +186,6 @@ int main()
         for(unsigned int w = 0; w < fractures.traces[idFrac].size(); w++){ //ciclo su ogni traccia della frattura
             idTrace = get<0>(fractures.traces[idFrac][w]); //prendo id traccia
             found = false;
-            line trace;
             trace.point = traces.vertices[idTrace].col(0);
             trace.direction = traces.vertices[idTrace].col(1) - trace.point;
             s1 = std::numeric_limits<double>::min();
@@ -194,7 +194,6 @@ int main()
                 if (mesh.isOn2D[idCell2D]){
                     n = mesh.verticesCell2Ds[idCell2D].size();
                     for (unsigned int i = 0; i < n; i++){ //per ogni lato della cella
-                        line edge;
                         edge.point = mesh.coordinateCell0Ds[mesh.verticesCell2Ds[idCell2D][i]];
                         edge.direction = mesh.coordinateCell0Ds[mesh.verticesCell2Ds[idCell2D][(i+1)%n]] - edge.point;
                         test = (trace.direction).cross(edge.direction);
@@ -241,7 +240,6 @@ int main()
             mesh.neighCell1Ds.resize(mesh.numberCell1Ds); mesh.neighCell1Ds[idNewEdge1].push_back(mesh.numberCell2Ds+1);
             mesh.isOn1D.push_back(true);
 
-            pass = false;
             for (unsigned int neigh : mesh.neighCell1Ds[idIntersectionEdge]){ //per ogni vicino del lato di intersezione
                 if (mesh.isOn2D[neigh] && neigh == idInitialCell2D){ //se sono nella cella che contiene la traccia
                     actualNeigh = neigh;
@@ -274,7 +272,6 @@ int main()
                         for (unsigned int v =  0; v < numberOfVertices-1; v++){
                             idCell0D = mesh.verticesCell2Ds[actualNeigh][(indexOfInitialPoint+v)%numberOfVertices];
                             idCell1D = mesh.edgesCell2Ds[actualNeigh][(indexOfInitialPoint+v)%numberOfVertices];
-                            line edge;
                             edge.point = mesh.coordinateCell0Ds[idCell0D];
                             edge.direction = mesh.coordinateCell0Ds[mesh.verticesCell2Ds[actualNeigh][(indexOfInitialPoint+v+1)%numberOfVertices]] - edge.point;
                             test = (trace.direction).cross(edge.direction);
@@ -322,7 +319,9 @@ int main()
                         mesh.edgesCell2Ds[mesh.numberCell2Ds+1].push_back(idInitialEdge1);
 
                         // inseriamo il lato generato dalla traccia
-                        mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size()+1); mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds); mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds+1);
+                        mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size()+1);
+                        mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds);
+                        mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds+1);
                         mesh.verticesCell1Ds.push_back({idIntersectionPoint,idNewIntersectionPoint});
                         mesh.isOn1D.push_back(true);
 
@@ -351,19 +350,23 @@ int main()
                                 existNeigh = true;
                             }
                         }
+                        if(existNeigh && !out){
+                            mesh.neighCell1Ds[idInitialEdge0].push_back(mesh.numberCell2Ds);
+                            mesh.neighCell1Ds[idInitialEdge1].push_back(mesh.numberCell2Ds+1);
+                        }
                     }
                     if (existNeigh){
-                        for (unsigned int i = 0; i < mesh.verticesCell2Ds[actualNeigh].size(); i++){
-                            if (!mesh.isOn1D[mesh.edgesCell2Ds[actualNeigh][i]]){
+                        for (unsigned int i = 0; i < mesh.verticesCell2Ds[actualNeigh].size(); i++){ //aggiorno il vicino adiacente all'intersection edge
+                            if (!mesh.isOn1D[mesh.edgesCell2Ds[actualNeigh][i]]){ //trovo il lato spento inserisco lì le cose nuove
                                 mesh.verticesCell2Ds[actualNeigh].insert(mesh.verticesCell2Ds[actualNeigh].begin() + i+1, idIntersectionPoint);
                                 mesh.edgesCell2Ds[actualNeigh].erase(mesh.edgesCell2Ds[actualNeigh].begin() + i);
                                 mesh.edgesCell2Ds[actualNeigh].insert(mesh.edgesCell2Ds[actualNeigh].begin() + i, idInitialEdge1);
                                 mesh.edgesCell2Ds[actualNeigh].insert(mesh.edgesCell2Ds[actualNeigh].begin() + i+1, idInitialEdge0);
+                                mesh.neighCell1Ds[idInitialEdge0].push_back(actualNeigh);
+                                mesh.neighCell1Ds[idInitialEdge1].push_back(actualNeigh);
                                 break;
                             }
                         }
-                        mesh.neighCell1Ds[idInitialEdge0].push_back(actualNeigh);
-                        mesh.neighCell1Ds[idInitialEdge1].push_back(actualNeigh);
                     }
                 }
                 else if (mesh.isOn2D[neigh] && neigh != idInitialCell2D){ // aggiorno la cella adiacente
@@ -373,6 +376,9 @@ int main()
                             mesh.edgesCell2Ds[neigh].erase(mesh.edgesCell2Ds[neigh].begin() + i);
                             mesh.edgesCell2Ds[neigh].insert(mesh.edgesCell2Ds[neigh].begin() + i, idNewEdge0);
                             mesh.edgesCell2Ds[neigh].insert(mesh.edgesCell2Ds[neigh].begin() + i+1, idNewEdge1);
+                            mesh.neighCell1Ds[idNewEdge0].push_back(neigh);
+                            mesh.neighCell1Ds[idNewEdge1].push_back(neigh);
+
                             break;
                         }
                     }
