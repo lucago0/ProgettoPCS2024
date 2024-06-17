@@ -61,7 +61,9 @@ bool almostEqual(const double& a, const double& b,const double& tol);
 bool arePlanesParallel(const Vector4d& v1, const Vector4d& v2, double& tol);
 bool compareByValue(const pair<unsigned int, double>& a, const pair<unsigned int,const double>& b);
 bool compareTuple(const tuple<unsigned int, bool, double>& a, const tuple<unsigned int, bool, double>& b);
-void print(vector<PolygonalMesh>& finalMesh);
+void print(PolygonalMesh& mesh);
+PolygonalMesh mergeMesh(vector<PolygonalMesh>& finalMesh);
+
 // double posizionePuntoPiano(const Vector4d& coeffPiano, const Vector3d& coordPunto);
 // void splitSubfractures(SubFracture& subFract, const fractures& fractures, const Traces& traces, PolygonalMesh &mesh, const unsigned int &idFrac, double& tol);
 

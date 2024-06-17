@@ -272,7 +272,7 @@ bool compareTuple(const tuple<unsigned int, bool, double>& a, const tuple<unsign
     return get<1>(a) < get<1>(b); // Ordina in base al valore booleano all'interno delle tuple
 }
 
-void print(vector<PolygonalMesh>& finalMesh){
+void print(PolygonalMesh& mesh){
 
     string outputMesh = "PolygonalMesh.txt";
     ofstream ofs(outputMesh);
@@ -285,42 +285,72 @@ void print(vector<PolygonalMesh>& finalMesh){
 
     ofs << "# ID Cell0D; X; Y; Z" << endl;
     unsigned int n = 0;
-    for(PolygonalMesh mesh:finalMesh){
-        for(unsigned int i = 0; i < mesh.numberCell0Ds; i++)
-        {
-            ofs << n++ << "; " << mesh.coordinateCell0Ds[i][0] << "; " << mesh.coordinateCell0Ds[i][1] << "; " << mesh.coordinateCell0Ds[i][2] << endl;
-        }
+
+    for(unsigned int i = 0; i < mesh.numberCell0Ds; i++)
+    {
+        ofs << n++ << "; " << mesh.coordinateCell0Ds[i][0] << "; " << mesh.coordinateCell0Ds[i][1] << "; " << mesh.coordinateCell0Ds[i][2] << endl;
     }
+
 
     ofs << endl;
     ofs << "# ID Cell1D; Origin; End" << endl;
-    unsigned int m = 0;
-    for(PolygonalMesh mesh:finalMesh){
-        for(unsigned int i = 0; i < mesh.numberCell1Ds; i++){
-            if(mesh.isOn1D[i]){
-                ofs << m++ << "; " << mesh.verticesCell1Ds[i][0] << "; " << mesh.verticesCell1Ds[i][1] << endl;
-            }
+    n = 0;
+
+    for(unsigned int i = 0; i < mesh.numberCell1Ds; i++){
+        if(mesh.isOn1D[i]){
+            ofs << n++ << "; " << mesh.verticesCell1Ds[i][0] << "; " << mesh.verticesCell1Ds[i][1] << endl;
         }
     }
+
 
     ofs << endl;
     ofs << "# ID Cell2D; NumVertices; Vertices; NumEdges; Edges" << endl;
-    unsigned int k = 0;
-    for(PolygonalMesh mesh:finalMesh){
-        for(unsigned int i = 0; i < mesh.numberCell2Ds; i++){
-            if(mesh.isOn2D[i]){
-                ofs << k++ << "; " << mesh.verticesCell2Ds[i].size();
-                for(unsigned int j = 0; j < mesh.verticesCell2Ds[i].size();j++)
-                    ofs << "; " << mesh.verticesCell2Ds[i][j];
-                ofs << i << "; " << mesh.edgesCell2Ds[i].size();
-                for(unsigned int j = 0; j < mesh.edgesCell2Ds[i].size();j++)
-                    ofs << "; " << mesh.edgesCell2Ds[i][j];
-                ofs << endl;
+    n = 0;
+    for(unsigned int i = 0; i < mesh.numberCell2Ds; i++){
+        if (mesh.isOn2D[i]){
+            ofs << n++ << "; " << mesh.verticesCell2Ds[i].size();
+            for(unsigned int j = 0; j < mesh.verticesCell2Ds[i].size();j++)
+                ofs << "; " << mesh.verticesCell2Ds[i][j];
+        }
+        ofs << i << "; " << mesh.edgesCell2Ds[i].size();
+        for(unsigned int j = 0; j < mesh.edgesCell2Ds[i].size();j++)
+            if (mesh.isOn1D[mesh.edgesCell2Ds[i][j]]){
+                ofs << "; " << mesh.edgesCell2Ds[i][j];
+            }
+        ofs << endl;
+    }
+}
+
+
+PolygonalMesh mergeMesh(vector<PolygonalMesh>& finalMesh){
+    PolygonalMesh outputMesh;
+    for (PolygonalMesh mesh : finalMesh){
+        outputMesh.numberCell0Ds += mesh.numberCell0Ds;
+        outputMesh.coordinateCell0Ds.insert(outputMesh.coordinateCell0Ds.end(), mesh.coordinateCell0Ds.begin(), mesh.coordinateCell0Ds.end());
+
+        outputMesh.numberCell1Ds += mesh.numberCell1Ds;
+        for (unsigned int i = 0; i < mesh.verticesCell1Ds.size(); i++){
+            outputMesh.verticesCell1Ds.push_back({outputMesh.numberCell0Ds + mesh.verticesCell1Ds[i][0],outputMesh.numberCell0Ds + mesh.verticesCell1Ds[i][1]});
+        }
+        outputMesh.isOn1D.insert(outputMesh.isOn1D.end(), mesh.isOn1D.begin(), mesh.isOn1D.end());
+
+        outputMesh.numberCell2Ds += mesh.numberCell2Ds;
+        for (unsigned int i = 0; i < mesh.verticesCell2Ds.size(); i++){
+            outputMesh.verticesCell2Ds.resize(outputMesh.verticesCell2Ds.size()+1);
+            for (unsigned int j = 0; j < mesh.verticesCell2Ds[i].size(); j++){
+                outputMesh.verticesCell2Ds[i][j] = outputMesh.numberCell0Ds + mesh.verticesCell2Ds[i][j];
             }
         }
+        for (unsigned int i = 0; i < mesh.edgesCell2Ds.size(); i++){
+            outputMesh.edgesCell2Ds.resize(outputMesh.edgesCell2Ds.size()+1);
+            for (unsigned int j = 0; j < mesh.verticesCell2Ds[i].size(); j++){
+                outputMesh.edgesCell2Ds[i][j] = outputMesh.numberCell1Ds + mesh.edgesCell2Ds[i][j];
+            }
+        }
+        outputMesh.isOn2D.insert(outputMesh.isOn2D.end(), mesh.isOn2D.begin(), mesh.isOn2D.end());
     }
-
+    return outputMesh;
+}
 }
 
-}
 

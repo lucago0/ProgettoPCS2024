@@ -8,7 +8,7 @@ using namespace fracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR200_data.txt";
+    string filepath = "./FR3_data.txt";
     if(!importFractures(filepath, fractures))
     {
         return 1;
@@ -387,10 +387,10 @@ int main()
                     }
                 }
             }
-
         }
         finalMesh.push_back(mesh);
     }
-    print(finalMesh);
+    PolygonalMesh outputMesh = mergeMesh(finalMesh);
+    print(outputMesh);
     return 0;
 }
