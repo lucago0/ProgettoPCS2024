@@ -168,7 +168,7 @@ line planesIntersection(const Vector4d &coeff1, const Vector4d &coeff2, const do
 
     Matrix<double,2,3> M;
     M << v1[0],v1[1],v1[2],
-    v2[0],v2[1],v2[2];
+        v2[0],v2[1],v2[2];
     Vector2d b = {-coeff1[3],-coeff2[3]};
 
     bool colZero = false;
@@ -270,6 +270,56 @@ bool arePlanesParallel(const Vector4d& v1, const Vector4d& v2, double& tol) {
 
 bool compareTuple(const tuple<unsigned int, bool, double>& a, const tuple<unsigned int, bool, double>& b) {
     return get<1>(a) < get<1>(b); // Ordina in base al valore booleano all'interno delle tuple
+}
+
+void print(vector<PolygonalMesh>& finalMesh){
+
+    string outputMesh = "PolygonalMesh.txt";
+    ofstream ofs(outputMesh);
+
+    if (ofs.fail())
+    {
+        cerr << "Error in creating the output file" << endl;
+        return;
+    }
+
+    ofs << "# ID Cell0D; X; Y; Z" << endl;
+    unsigned int n = 0;
+    for(PolygonalMesh mesh:finalMesh){
+        for(unsigned int i = 0; i < mesh.numberCell0Ds; i++)
+        {
+            ofs << n++ << "; " << mesh.coordinateCell0Ds[i][0] << "; " << mesh.coordinateCell0Ds[i][1] << "; " << mesh.coordinateCell0Ds[i][2] << endl;
+        }
+    }
+
+    ofs << endl;
+    ofs << "# ID Cell1D; Origin; End" << endl;
+    unsigned int m = 0;
+    for(PolygonalMesh mesh:finalMesh){
+        for(unsigned int i = 0; i < mesh.numberCell1Ds; i++){
+            if(mesh.isOn1D[i]){
+                ofs << m++ << "; " << mesh.verticesCell1Ds[i][0] << "; " << mesh.verticesCell1Ds[i][1] << endl;
+            }
+        }
+    }
+
+    ofs << endl;
+    ofs << "# ID Cell2D; NumVertices; Vertices; NumEdges; Edges" << endl;
+    unsigned int k = 0;
+    for(PolygonalMesh mesh:finalMesh){
+        for(unsigned int i = 0; i < mesh.numberCell2Ds; i++){
+            if(mesh.isOn2D[i]){
+                ofs << k++ << "; " << mesh.verticesCell2Ds[i].size();
+                for(unsigned int j = 0; j < mesh.verticesCell2Ds[i].size();j++)
+                    ofs << "; " << mesh.verticesCell2Ds[i][j];
+                ofs << i << "; " << mesh.edgesCell2Ds[i].size();
+                for(unsigned int j = 0; j < mesh.edgesCell2Ds[i].size();j++)
+                    ofs << "; " << mesh.edgesCell2Ds[i][j];
+                ofs << endl;
+            }
+        }
+    }
+
 }
 
 }

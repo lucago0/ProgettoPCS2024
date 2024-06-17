@@ -17,21 +17,12 @@ struct Fractures{
     vector<Vector4d> planeCoeffs;
     vector<unsigned int> numberOfTraces = {};
     vector<vector<tuple<unsigned int, bool, double>>> traces; //ad ogni id frattura associo vettore di idtracce con le info per ogni traccia
-    vector<vector<Matrix<double, 3, Dynamic>>> SubFracVert; //vertici sotto frattura
-};
-
-struct SubFracture{
-    Matrix<double, 3 ,Dynamic> Vertices;
-    vector<unsigned int> VerticesId;
-    vector<unsigned int> EdgesId;
-    vector<unsigned int> traceId;
 };
 
 struct Traces{
     unsigned int numberOfTraces = 0;
     vector<array<unsigned int, 4>> fracturesId; //{id1,id2,tips1,tips2} id1 e id2 sono gli id delle fratture associate ad idtraccia
     vector<Matrix<double,3,2>> vertices;
-    //map<unsigned int, array<bool,2>> Tips;
     map<unsigned int, double> lengths;
 };
 
@@ -70,6 +61,7 @@ bool almostEqual(const double& a, const double& b,const double& tol);
 bool arePlanesParallel(const Vector4d& v1, const Vector4d& v2, double& tol);
 bool compareByValue(const pair<unsigned int, double>& a, const pair<unsigned int,const double>& b);
 bool compareTuple(const tuple<unsigned int, bool, double>& a, const tuple<unsigned int, bool, double>& b);
+void print(vector<PolygonalMesh>& finalMesh);
 // double posizionePuntoPiano(const Vector4d& coeffPiano, const Vector3d& coordPunto);
 // void splitSubfractures(SubFracture& subFract, const fractures& fractures, const Traces& traces, PolygonalMesh &mesh, const unsigned int &idFrac, double& tol);
 

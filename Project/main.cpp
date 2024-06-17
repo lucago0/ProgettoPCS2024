@@ -125,45 +125,48 @@ int main()
 
     // PARTE 2
 
-    PolygonalMesh mesh;
-    Vector3d coordinatesIntersectionPoint = {0,0,0};
-    Vector3d test = {0,0,0};
-    VectorXd q;
-    line trace;
-    line edge;
-    unsigned int idIntersectionEdge = 0;
-    unsigned int idNewIntersectionEdge = 0;
-    unsigned int idIntersectionPoint = 0;
-    unsigned int idNewIntersectionPoint = 0;
-    unsigned int actualNeigh = 0;
-    unsigned int idSuccessivePoint = 0;
-    unsigned int idNewSuccessivePoint = 0;
-    unsigned int idPreviousPoint = 0;
-    unsigned int idNewPreviousPoint = 0;
-    unsigned int idNewEdge0 = 0;
-    unsigned int idNewEdge1 = 0;
-    unsigned int idInitialEdge0 = 0;
-    unsigned int idNewInitialEdge0 = 0;
-    unsigned int idInitialEdge1 = 0;
-    unsigned int idNewInitialEdge1 = 0;
-    unsigned int idInitialCell2D = 0;
-    unsigned int numberOfVertices = 0;
-    unsigned int numberOfCell2DsNow = 0;
-    unsigned int idTrace = 0;
-    unsigned int n = 0;
-    unsigned int idNewPoint = 0;
-    unsigned int polygon = 0;
-    unsigned int indexOfInitialPoint = 0;
-    unsigned int idCell0D = 0;
-    unsigned int idCell1D = 0;
-    bool out = false;
-    bool found = false;
-    double s = 0;
-    double t = 0;
-    double s1 = 0;
-    bool existNeigh = false;
+    vector<PolygonalMesh> finalMesh;
 
     for (unsigned int idFrac = 0; idFrac < fractures.numberOfFractures; idFrac++){ //ciclo su ogni frattura
+
+        PolygonalMesh mesh;
+        Vector3d coordinatesIntersectionPoint = {0,0,0};
+        Vector3d test = {0,0,0};
+        VectorXd q;
+        line trace;
+        line edge;
+        unsigned int idIntersectionEdge = 0;
+        unsigned int idNewIntersectionEdge = 0;
+        unsigned int idIntersectionPoint = 0;
+        unsigned int idNewIntersectionPoint = 0;
+        unsigned int actualNeigh = 0;
+        unsigned int idSuccessivePoint = 0;
+        unsigned int idNewSuccessivePoint = 0;
+        unsigned int idPreviousPoint = 0;
+        unsigned int idNewPreviousPoint = 0;
+        unsigned int idNewEdge0 = 0;
+        unsigned int idNewEdge1 = 0;
+        unsigned int idInitialEdge0 = 0;
+        unsigned int idNewInitialEdge0 = 0;
+        unsigned int idInitialEdge1 = 0;
+        unsigned int idNewInitialEdge1 = 0;
+        unsigned int idInitialCell2D = 0;
+        unsigned int numberOfVertices = 0;
+        unsigned int numberOfCell2DsNow = 0;
+        unsigned int idTrace = 0;
+        unsigned int n = 0;
+        unsigned int idNewPoint = 0;
+        unsigned int polygon = 0;
+        unsigned int indexOfInitialPoint = 0;
+        unsigned int idCell0D = 0;
+        unsigned int idCell1D = 0;
+        bool out = false;
+        bool found = false;
+        double s = 0;
+        double t = 0;
+        double s1 = 0;
+        bool existNeigh = false;
+
         numberOfVertices = fractures.vertices[idFrac].cols();
         mesh.verticesCell2Ds.resize(mesh.numberCell2Ds+1);
         mesh.edgesCell2Ds.resize(mesh.numberCell2Ds+1);
@@ -188,7 +191,7 @@ int main()
             found = false;
             trace.point = traces.vertices[idTrace].col(0);
             trace.direction = traces.vertices[idTrace].col(1) - trace.point;
-            s1 = std::numeric_limits<double>::min();
+            s1 = -std::numeric_limits<double>::max();
 
             for (unsigned int idCell2D = numberOfCell2DsNow-1; idCell2D < mesh.numberCell2Ds; idCell2D++){ //cella 2D su cui lavoro
                 if (mesh.isOn2D[idCell2D]){
@@ -210,7 +213,7 @@ int main()
                                     found = true;
                                     break;
                                 }
-                                else if (s > (s1-tol) && s <(0+tol)){
+                                else if (s > (s1-tol) && s < (0+tol)){
                                     s1 = s;
                                     coordinatesIntersectionPoint = q.head(3);
                                     idIntersectionEdge = mesh.edgesCell2Ds[idCell2D][i];
@@ -231,12 +234,12 @@ int main()
             mesh.isOn1D[idIntersectionEdge] = false; //spengo il lato da cui parto
 
             idNewEdge0 = mesh.numberCell1Ds++;
-            mesh.verticesCell1Ds.push_back({idIntersectionPoint,idSuccessivePoint});
+            mesh.verticesCell1Ds.push_back({idNewPoint,idSuccessivePoint});
             mesh.neighCell1Ds.resize(mesh.numberCell1Ds); mesh.neighCell1Ds[idNewEdge0].push_back(mesh.numberCell2Ds);
             mesh.isOn1D.push_back(true);
 
             idNewEdge1 = mesh.numberCell1Ds++;
-            mesh.verticesCell1Ds.push_back({idPreviousPoint,idIntersectionPoint});
+            mesh.verticesCell1Ds.push_back({idPreviousPoint,idNewPoint});
             mesh.neighCell1Ds.resize(mesh.numberCell1Ds); mesh.neighCell1Ds[idNewEdge1].push_back(mesh.numberCell2Ds+1);
             mesh.isOn1D.push_back(true);
 
@@ -384,7 +387,10 @@ int main()
                     }
                 }
             }
+
         }
+        finalMesh.push_back(mesh);
     }
+    print(finalMesh);
     return 0;
 }
