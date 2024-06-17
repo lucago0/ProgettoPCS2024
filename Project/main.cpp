@@ -224,34 +224,35 @@ int main()
             mesh.neighCell1Ds.resize(mesh.numberCell1Ds); mesh.neighCell1Ds[idInitialEdge1].push_back(mesh.numberCell2Ds+1);
             mesh.isOn1D.push_back(true);
 
-            bool pass = true;
+            bool pass = false;
             for (unsigned int neigh : mesh.neighCell1Ds[idIntersectionEdge]){ //per ogni vicino del lato di intersezione
-                if (!found && neigh != idInitialCell2D){
-                    pass = false;
+                if (!found && neigh == idInitialCell2D){ // se la traccia è interna e il vicino non è la cella 2D che contiene la traccia
+                    pass = true;
                 }
                 if (mesh.isOn2D[neigh] && pass){
                     actualNeigh = neigh;
                     out = false;
-                    while (!out){ //finchè non finisco la traccia
+                    while (!out){ // finchè non finisco la traccia
                         unsigned int polygon = 0;
                         //trovo la posizione di idSuccessivePoint in mesh.verticesCell2Ds[actualNeigh]
                         unsigned int indexOfInitialPoint = 0;
                         unsigned int numberOfVertices = mesh.verticesCell2Ds[actualNeigh].size();
                         for (unsigned int j = 0; j < numberOfVertices; j++){
                             if (mesh.verticesCell2Ds[actualNeigh][j] == idSuccessivePoint){
-                                indexOfInitialPoint = j;//num vertici poligono precedente
+                                indexOfInitialPoint = j; //num vertici poligono precedente
                                 break;
                             }
                         }
-
+                        // creo spazio per le nuove celle 2D
                         mesh.verticesCell2Ds.resize(mesh.verticesCell2Ds.size()+2);
                         mesh.edgesCell2Ds.resize(mesh.edgesCell2Ds.size()+2);
 
+                        // aggiorno solamente la cella 0
                         mesh.verticesCell2Ds[mesh.numberCell2Ds].push_back(idIntersectionPoint);
                         mesh.edgesCell2Ds[mesh.numberCell2Ds].push_back(idInitialEdge0);
 
                         mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size()+2); // troveremo due nuovi lati
-                        for (unsigned int v =  1; v < numberOfVertices; v++){
+                        for (unsigned int v =  0; v < numberOfVertices-1; v++){
                             unsigned int idCell0D = mesh.verticesCell2Ds[actualNeigh][(indexOfInitialPoint+v)%numberOfVertices];
                             unsigned int idCell1D = mesh.edgesCell2Ds[actualNeigh][(indexOfInitialPoint+v)%numberOfVertices];
                             line edge;
@@ -266,7 +267,7 @@ int main()
                                 idNewIntersectionPoint = mesh.numberCell0Ds++;
                                 mesh.coordinateCell0Ds.push_back(q.head(3));
 
-                                idNewSuccessivePoint = idCell0D;
+                                idNewSuccessivePoint = idCell0D; // potrei dover continuare a tagliare in senso antiorario la cella adiacente
                                 idNewPrevoiusPoint = mesh.verticesCell2Ds[actualNeigh][(indexOfInitialPoint+v+1)%numberOfVertices];
 
                                 idNewIntersectionEdge = idCell1D;
@@ -300,17 +301,20 @@ int main()
                         mesh.verticesCell2Ds[mesh.numberCell2Ds+1].push_back(idPrevoiusPoint);
                         mesh.edgesCell2Ds[mesh.numberCell2Ds].push_back(idInitialEdge1);
 
+                        // inseriamo il lato generato dalla traccia
                         mesh.neighCell1Ds.resize(mesh.neighCell1Ds.size()+1); mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds); mesh.neighCell1Ds[mesh.numberCell1Ds].push_back(mesh.numberCell2Ds+1);
                         mesh.verticesCell1Ds.push_back({idIntersectionPoint,idNewIntersectionPoint});
                         mesh.isOn1D.push_back(true);
+                        mesh.numberCell1Ds++;
+
                         mesh.edgesCell2Ds[mesh.numberCell2Ds].push_back(mesh.numberCell1Ds);
                         mesh.edgesCell2Ds[mesh.numberCell2Ds+1].push_back(mesh.numberCell1Ds);
-                        mesh.numberCell1Ds++;
 
                         mesh.numberCell2Ds += 2;
                         mesh.isOn2D[actualNeigh] = false;
                         mesh.isOn2D.push_back(true); mesh.isOn2D.push_back(true);
 
+                        // tutto ciò che è vecchio, lascia il posto al nuovo
                         idIntersectionPoint = idNewIntersectionPoint;
                         idPrevoiusPoint = idNewPrevoiusPoint;
                         idSuccessivePoint = idNewSuccessivePoint;
@@ -338,6 +342,17 @@ int main()
                     }
                     mesh.neighCell1Ds[idInitialEdge0].push_back(actualNeigh);
                     mesh.neighCell1Ds[idInitialEdge1].push_back(actualNeigh);
+                }
+                else if (!found && neigh != idInitialCell2D){ // aggiorno la cella adiacente
+                    for (unsigned int i = 0; i < mesh.verticesCell2Ds[neigh].size(); i++){
+                        if (!mesh.isOn1D[mesh.edgesCell2Ds[neigh][i]]){
+                            mesh.verticesCell2Ds[neigh].insert(mesh.verticesCell2Ds[neigh].begin() + i+1, idIntersectionPoint);
+                            mesh.edgesCell2Ds[neigh].erase(mesh.edgesCell2Ds[neigh].begin() + i);
+                            mesh.edgesCell2Ds[neigh].insert(mesh.edgesCell2Ds[neigh].begin() + i, idInitialEdge0);
+                            mesh.edgesCell2Ds[neigh].insert(mesh.edgesCell2Ds[neigh].begin() + i+1, idInitialEdge1);
+                            break;
+                        }
+                    }
                 }
             }
         }
