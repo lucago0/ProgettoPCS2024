@@ -138,6 +138,8 @@ int main()
     unsigned int idNewSuccessivePoint = 0;
     unsigned int idPreviousPoint = 0;
     unsigned int idNewPreviousPoint = 0;
+    unsigned int idNewEdge0 = 0;
+    unsigned int idNewEdge1 = 0;
     unsigned int idInitialEdge0 = 0;
     unsigned int idNewInitialEdge0 = 0;
     unsigned int idInitialEdge1 = 0;
@@ -147,6 +149,7 @@ int main()
     unsigned int numberOfCell2DsNow = 0;
     unsigned int idTrace = 0;
     unsigned int n = 0;
+    unsigned int idNewPoint = 0;
     unsigned int polygon = 0;
     unsigned int indexOfInitialPoint = 0;
     unsigned int idCell0D = 0;
@@ -225,17 +228,17 @@ int main()
                 }
             }
             mesh.coordinateCell0Ds.push_back(coordinatesIntersectionPoint);
-            idIntersectionPoint = mesh.numberCell0Ds++;
+            idNewPoint = mesh.numberCell0Ds++;
             mesh.isOn1D[idIntersectionEdge] = false; //spengo il lato da cui parto
 
-            idInitialEdge0 = mesh.numberCell1Ds++;
+            idNewEdge0 = mesh.numberCell1Ds++;
             mesh.verticesCell1Ds.push_back({idIntersectionPoint,idSuccessivePoint});
-            mesh.neighCell1Ds.resize(mesh.numberCell1Ds); mesh.neighCell1Ds[idInitialEdge0].push_back(mesh.numberCell2Ds);
+            mesh.neighCell1Ds.resize(mesh.numberCell1Ds); mesh.neighCell1Ds[idNewEdge0].push_back(mesh.numberCell2Ds);
             mesh.isOn1D.push_back(true);
 
-            idInitialEdge1 = mesh.numberCell1Ds++;
+            idNewEdge1 = mesh.numberCell1Ds++;
             mesh.verticesCell1Ds.push_back({idPreviousPoint,idIntersectionPoint});
-            mesh.neighCell1Ds.resize(mesh.numberCell1Ds); mesh.neighCell1Ds[idInitialEdge1].push_back(mesh.numberCell2Ds+1);
+            mesh.neighCell1Ds.resize(mesh.numberCell1Ds); mesh.neighCell1Ds[idNewEdge1].push_back(mesh.numberCell2Ds+1);
             mesh.isOn1D.push_back(true);
 
             pass = false;
@@ -244,6 +247,9 @@ int main()
                     actualNeigh = neigh;
                     out = false;
                     existNeigh = true;
+                    idInitialEdge0 = idNewEdge0;
+                    idInitialEdge1 = idNewEdge1;
+                    idIntersectionPoint = idNewPoint;
                     while (!out && existNeigh){ // finchè non finisco la traccia
                         existNeigh = false;
                         polygon = 0;
@@ -346,7 +352,7 @@ int main()
                             }
                         }
                     }
-                    if(existNeigh){
+                    if (existNeigh){
                         for (unsigned int i = 0; i < mesh.verticesCell2Ds[actualNeigh].size(); i++){
                             if (!mesh.isOn1D[mesh.edgesCell2Ds[actualNeigh][i]]){
                                 mesh.verticesCell2Ds[actualNeigh].insert(mesh.verticesCell2Ds[actualNeigh].begin() + i+1, idIntersectionPoint);
@@ -360,13 +366,13 @@ int main()
                         mesh.neighCell1Ds[idInitialEdge1].push_back(actualNeigh);
                     }
                 }
-                else if (!found && neigh != idInitialCell2D){ // aggiorno la cella adiacente
+                else if (mesh.isOn2D[neigh] && neigh != idInitialCell2D){ // aggiorno la cella adiacente
                     for (unsigned int i = 0; i < mesh.verticesCell2Ds[neigh].size(); i++){
                         if (!mesh.isOn1D[mesh.edgesCell2Ds[neigh][i]]){
-                            mesh.verticesCell2Ds[neigh].insert(mesh.verticesCell2Ds[neigh].begin() + i+1, idIntersectionPoint);
+                            mesh.verticesCell2Ds[neigh].insert(mesh.verticesCell2Ds[neigh].begin() + i+1, idNewPoint);
                             mesh.edgesCell2Ds[neigh].erase(mesh.edgesCell2Ds[neigh].begin() + i);
-                            mesh.edgesCell2Ds[neigh].insert(mesh.edgesCell2Ds[neigh].begin() + i, idInitialEdge0);
-                            mesh.edgesCell2Ds[neigh].insert(mesh.edgesCell2Ds[neigh].begin() + i+1, idInitialEdge1);
+                            mesh.edgesCell2Ds[neigh].insert(mesh.edgesCell2Ds[neigh].begin() + i, idNewEdge0);
+                            mesh.edgesCell2Ds[neigh].insert(mesh.edgesCell2Ds[neigh].begin() + i+1, idNewEdge1);
                             break;
                         }
                     }
