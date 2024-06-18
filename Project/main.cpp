@@ -184,8 +184,6 @@ int main()
         mesh.numberCell2Ds++;
         mesh.isOn2D.push_back(true);
 
-        numberOfCell2DsNow = mesh.numberCell2Ds;
-
         for(unsigned int w = 0; w < fractures.traces[idFrac].size(); w++){ //ciclo su ogni traccia della frattura
             idTrace = get<0>(fractures.traces[idFrac][w]); //prendo id traccia
             found = false;
@@ -193,7 +191,7 @@ int main()
             trace.direction = traces.vertices[idTrace].col(1) - trace.point;
             s1 = -std::numeric_limits<double>::max();
 
-            for (unsigned int idCell2D = numberOfCell2DsNow-1; idCell2D < mesh.numberCell2Ds; idCell2D++){ //cella 2D su cui lavoro
+            for (unsigned int idCell2D = 0; idCell2D < mesh.numberCell2Ds; idCell2D++){ //cella 2D su cui lavoro
                 if (mesh.isOn2D[idCell2D]){
                     n = mesh.verticesCell2Ds[idCell2D].size();
                     for (unsigned int i = 0; i < n; i++){ //per ogni lato della cella

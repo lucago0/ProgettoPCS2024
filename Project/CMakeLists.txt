@@ -43,11 +43,6 @@ list(APPEND ${CMAKE_PROJECT_NAME}_sources ${DFN_sources})
 list(APPEND ${CMAKE_PROJECT_NAME}_headers ${DFN_headers})
 list(APPEND ${CMAKE_PROJECT_NAME}_includes ${DFN_includes})
 
-add_subdirectory(TestingParaview/Code/src)
-list(APPEND ${CMAKE_PROJECT_NAME}_sources ${src_paraview_sources})
-list(APPEND ${CMAKE_PROJECT_NAME}_headers ${src_paraview_headers})
-list(APPEND ${CMAKE_PROJECT_NAME}_includes ${src_paraview_includes})
-
 add_subdirectory(src_test)
 list(APPEND ${CMAKE_PROJECT_NAME}_TEST_sources ${src_test_sources})
 list(APPEND ${CMAKE_PROJECT_NAME}_TEST_headers ${src_test_headers})
