@@ -6,6 +6,7 @@
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{enumerate}
+\usepackage{wrapfig}
 \newcommand{\B}{\mathbf}
 \usepackage{graphicx}
 \usepackage{courier}
@@ -124,6 +125,13 @@ v_zt-(z_{j+1}-z_j)s=z_j-\overline{z} \\
 \end{equation}
 Potrebbe succedere che il sistema non ammetta soluzioni, in tal caso le due rette non si intersecano, cioè la traccia non attraversa il lato $\B{P}j\B{P}{j+1}$. Altrimenti, in caso di sistema determinato otterremo la coppia $(s,t)$. Se $s\in[0,1]$ otteniamo effettivamente che il punto di intersezione giace sul lato $\B{P}j\B{P}{j+1}$ della prima frattura. Iteriamo il processo per tutti gli $n_i$ vertici della frattura e troveremo due punti $\B{Q}_1$ e $\B{Q}_2$, trovati attraverso l'intersezione tra $r$ e due lati distinti della frattura.
 
+\begin{wrapfigure}{r}{0.45\textwidth}
+    \centering
+    \includegraphics[width=0.45 \textwidth]{im2.png}
+    \caption{Esempio con 3 fratture e 2 tracce}
+    \label{fig:esempio}
+\end{wrapfigure}
+
 Alla stessa maniera, effettuiamo questi calcoli per la seconda frattura, trovando o intersezione nulla per ogni lato o due altri due punti $\B{Q}_3$ e $\B{Q}_4$.
 
 Nel caso in cui troviamo i 4 punti di intersezione, associamo ad ognuno il valore di $t$ corrispondente trovato nel sistema \eqref{sis:parametri} e costruiamo due intervalli dell'asse reale ordinando i valori dei parametri: otteniamo allora $(a,b)$ e $(c,d)$, dove $a,b\in\{t_1,t_2\}$ e $c,d\in\{t_3,t_4\}$. Se poniamo $a=\text{min}\{t_1,t_2\}$, $b=\text{max}\{t_1,t_2\}$, $c=\text{min}\{t_3,t_4\}$ e $d=\text{max}\{t_3,t_4\}$, attraverso una funzione che calcoli l'intersezione tra questi due intervalli, verifichiamo che
@@ -215,11 +223,11 @@ L'aggiornamento del poligono adiacente va fatto solo nel caso in cui questo esis
 \subsection{Esempio}
 Di seguito considereremo un esempio chiarificatore. Le notazioni fin qui adottate saranno semplificate ulteriormente al fine di favorire al meglio l'esposizione. Consideriamo una sola frattura (Figura \ref{fig:esempio}) identificata da 4 vertici: $\B A$, $\B B$, $\B C$, $\B D$. 
 
-\begin{figure}[h]
+\begin{figure}
     \centering
-    \includegraphics[width=11.5 cm]{im1.jpeg}
+    \includegraphics[width=1 \textwidth]{im3.png}
     \caption{Esempio}
-    \label{fig:esempio}
+    \label{fig:esempio2}
 \end{figure}
 
 Su questa frattura consideriamo due tracce: la più lunga $\B{OP}$ e la più corta $\B{RS}$. Una volta trasferite le informazioni della frattura nella struttura \texttt{PolygonalMesh}, partiamo per ordine di lunghezza e scegliamo la traccia $\B{OP}$. Per ogni lato di $\B{ABCD}$, intersechiamo, usando il sistema \eqref{eq:intersezioni}, la traccia con esso: questo sistema avrà una soluzione con $t\in[0,1]$ solo per i lati $\B{AB}$ e $\B{CD}$. Scegliamo come \texttt{idIntersectionEdge} l'identificativo di $\B{AB}$ e aggiungiamo alla mesh il punto $\B O$ con un nuovo identificativo (sarà 4, in quanto i primi 4 vertici avranno rispettivamente 0,1,2,3).

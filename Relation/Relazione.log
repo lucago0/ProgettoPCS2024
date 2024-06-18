@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.9.25)  17 JUN 2024 19:37
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.9.25)  18 JUN 2024 20:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -186,6 +186,14 @@ LaTeX Info: Redefining \] on input line 2954.
 Package: enumerate 2015/07/23 v3.00 enumerate extensions (DPC)
 \@enLab=\toks32
 )
+(c:/texlive/2023/texmf-dist/tex/latex/wrapfig/wrapfig.sty
+\wrapoverhang=\dimen161
+\WF@size=\dimen162
+\c@WF@wrappedlines=\count281
+\WF@box=\box54
+\WF@everypar=\toks33
+Package: wrapfig 2003/01/31  v 3.6
+)
 (c:/texlive/2023/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
 
@@ -203,16 +211,16 @@ Package graphics Info: Driver file: pdftex.def on input line 107.
 (c:/texlive/2023/texmf-dist/tex/latex/graphics-def/pdftex.def
 File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen161
-\Gin@req@width=\dimen162
+\Gin@req@height=\dimen163
+\Gin@req@width=\dimen164
 )
 (c:/texlive/2023/texmf-dist/tex/latex/psnfss/courier.sty
 Package: courier 2020/03/25 PSNFSS-v9.3 (WaS) 
 )
 (c:/texlive/2023/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2023-04-19 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count281
-\l__pdf_internal_box=\box54
+\l__color_backend_stack_int=\count282
+\l__pdf_internal_box=\box55
 )
 (./Relazione.aux
 
@@ -221,35 +229,35 @@ LaTeX Warning: Label `sis:parametri' multiply defined.
 )
 \openout1 = `Relazione.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Info: Redefining \it@ocap on input line 17.
-LaTeX Info: Redefining \it@ccap on input line 17.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Info: Redefining \it@ocap on input line 18.
+LaTeX Info: Redefining \it@ccap on input line 18.
  (c:/texlive/2023/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count282
-\scratchdimen=\dimen163
-\scratchbox=\box55
-\nofMPsegments=\count283
-\nofMParguments=\count284
-\everyMPshowfont=\toks33
-\MPscratchCnt=\count285
-\MPscratchDim=\dimen164
-\MPnumerator=\count286
-\makeMPintoPDFobject=\count287
-\everyMPtoPDFconversion=\toks34
+\scratchcounter=\count283
+\scratchdimen=\dimen165
+\scratchbox=\box56
+\nofMPsegments=\count284
+\nofMParguments=\count285
+\everyMPshowfont=\toks34
+\MPscratchCnt=\count286
+\MPscratchDim=\dimen166
+\MPnumerator=\count287
+\makeMPintoPDFobject=\count288
+\everyMPtoPDFconversion=\toks35
 ) (c:/texlive/2023/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
@@ -259,13 +267,13 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Font Info:    Trying to load font information for U+msa on input line 19.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 20.
 
 
 (c:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 19.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 20.
 
 
 (c:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -278,27 +286,29 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 [1
 
 {c:/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{c:/texlive/2023/
-texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}] [2] [3] [4]
-Underfull \hbox (badness 10000) in paragraph at lines 146--147
+texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}] [2] [3]
+<im2.png, id=30, 665.48625pt x 465.99094pt>
+File: im2.png Graphic file (type png)
+<use im2.png>
+Package pdftex.def Info: im2.png  used on input line 130.
+(pdftex.def)             Requested size: 155.24895pt x 108.70439pt.
+ [4 <./im2.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 154--155
 
  []
 
-LaTeX Font Info:    Trying to load font information for T1+pcr on input line 16
-8.
+LaTeX Font Info:    Trying to load font information for T1+pcr on input line 17
+6.
 (c:/texlive/2023/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-) [5{c:/texlive/2023/texmf-dist/fonts/enc/dvips/base/8r.enc}] [6{c:/texlive/202
-3/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
-<im1.jpeg, id=42, 865.2325pt x 837.1275pt>
-File: im1.jpeg Graphic file (type jpg)
-<use im1.jpeg>
-Package pdftex.def Info: im1.jpeg  used on input line 220.
-(pdftex.def)             Requested size: 327.20668pt x 316.57893pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[7] [8 <./im1.jpeg>] [9] (./Relazione.aux)
+) [5] [6{c:/texlive/2023/texmf-dist/fonts/enc/dvips/base/8r.enc}]
+<im3.png, id=44, 681.29532pt x 513.41812pt>
+File: im3.png Graphic file (type png)
+<use im3.png>
+Package pdftex.def Info: im3.png  used on input line 228.
+(pdftex.def)             Requested size: 345.0pt x 259.99092pt.
+ [7{c:/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}] [8 <
+./im3.png>] [9] (./Relazione.aux)
  ***********
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-08-29>
@@ -309,13 +319,13 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 5063 strings out of 474927
- 77293 string characters out of 5763541
+ 5152 strings out of 474927
+ 78649 string characters out of 5763541
  1932785 words of memory out of 5000000
- 26542 multiletter control sequences out of 15000+600000
+ 26627 multiletter control sequences out of 15000+600000
  575447 words of font info for 80 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 70i,13n,79p,2202b,239s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 70i,13n,79p,2202b,241s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><c:/tex
 live/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2023
 /texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2023/texmf-di
@@ -334,10 +344,10 @@ super/sfrm0900.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/sfrm
 c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/sfrm1728.pfb><c:/texlive
 /2023/texmf-dist/fonts/type1/public/cm-super/sfti1000.pfb><c:/texlive/2023/texm
 f-dist/fonts/type1/urw/courier/ucrr8a.pfb>
-Output written on Relazione.pdf (9 pages, 306119 bytes).
+Output written on Relazione.pdf (9 pages, 351713 bytes).
 PDF statistics:
- 141 PDF objects out of 1000 (max. 8388607)
- 87 compressed objects within 1 object stream
+ 145 PDF objects out of 1000 (max. 8388607)
+ 88 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
 
