@@ -8,7 +8,7 @@ using namespace fracturesLib;
 int main()
 {
     Fractures fractures;
-    string filepath = "./FR200_data.txt";
+    string filepath = "./FR3_data.txt";
     if(!importFractures(filepath, fractures))
     {
         return 1;
@@ -208,6 +208,7 @@ int main()
                                     idIntersectionEdge = mesh.edgesCell2Ds[idCell2D][i];
                                     idPreviousPoint = mesh.verticesCell2Ds[idCell2D][(i)%n];
                                     idSuccessivePoint = mesh.verticesCell2Ds[idCell2D][(i+1)%n];
+                                    idInitialCell2D = idCell2D;
                                     found = true;
                                     break;
                                 }
