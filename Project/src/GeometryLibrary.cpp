@@ -232,7 +232,7 @@ PolygonalMesh mergeMesh(vector<PolygonalMesh>& finalMesh, const unsigned int& NC
     outputMesh.edgesCell2Ds.resize(NCell2D);
     outputMesh.isOn2D.resize(NCell2D);
 
-    for (PolygonalMesh mesh : finalMesh){
+    for (PolygonalMesh& mesh : finalMesh){
 
         for (unsigned int i = 0; i < mesh.numberCell0Ds; i++){
             outputMesh.coordinateCell0Ds[outputMesh.numberCell0Ds + i] = mesh.coordinateCell0Ds[i];
