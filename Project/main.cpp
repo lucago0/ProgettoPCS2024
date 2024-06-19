@@ -127,6 +127,11 @@ int main()
 
     vector<PolygonalMesh> finalMesh;
 
+    unsigned int NCell0D = 0;
+    unsigned int NCell1D = 0;
+    unsigned int NCell2D = 0;
+    finalMesh.resize(fractures.numberOfFractures);
+
     for (unsigned int idFrac = 0; idFrac < fractures.numberOfFractures; idFrac++){ //ciclo su ogni frattura
 
         PolygonalMesh mesh;
@@ -387,9 +392,12 @@ int main()
                 }
             }
         }
-        finalMesh.push_back(mesh);
+        NCell0D += mesh.numberCell0Ds;
+        NCell1D += mesh.numberCell1Ds;
+        NCell2D += mesh.numberCell2Ds;
+        finalMesh[idFrac] = mesh;
     }
-    PolygonalMesh outputMesh = mergeMesh(finalMesh);
+    PolygonalMesh outputMesh = mergeMesh(finalMesh,NCell0D,NCell1D,NCell2D);
     print(outputMesh);
     return 0;
 }

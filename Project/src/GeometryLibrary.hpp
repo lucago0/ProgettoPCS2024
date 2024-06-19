@@ -43,9 +43,6 @@ struct PolygonalMesh{
     vector<vector<unsigned int>> verticesCell2Ds = {};
     vector<vector<unsigned int>> edgesCell2Ds = {};
     vector<bool> isOn2D;
-
-    /* double tau = numeric_limits<double>::epsilon();
-    double tol = tau*tau/2; */
 };
 
 
@@ -54,7 +51,7 @@ void outputFile(Traces& traces, Fractures& fractures);
 line planesIntersection(const Vector4d& coeff1, const Vector4d& coeff2, const double& tol);
 VectorXd linesIntersection(const line& r,const line& rj);
 void print(PolygonalMesh& mesh);
-PolygonalMesh mergeMesh(vector<PolygonalMesh>& finalMesh);
+PolygonalMesh mergeMesh(vector<PolygonalMesh>& finalMesh, const unsigned int& NCell0D, const unsigned int& NCell1D, const unsigned int& NCell2D);
 
 inline double distanceSquared(const Vector3d& a,const Vector3d& b){
     return pow(a[0]-b[0],2) + pow(a[1]-b[1],2) + pow(a[2]-b[2],2);
